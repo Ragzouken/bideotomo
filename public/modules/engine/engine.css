@@ -1,0 +1,57 @@
+* {
+  /* make sizing make sense */
+  box-sizing: border-box;
+  ::before, ::after {
+    box-sizing: border-box;
+  }
+
+  /* suppress highlights and selections */
+  -webkit-tap-highlight-color: transparent;
+  user-select: none;
+  touch-action: none;
+}
+
+:root {
+  /* suppress awful auto text sizing */
+  -moz-text-size-adjust: none;
+  -webkit-text-size-adjust: none;
+  text-size-adjust: none;
+
+  /* suppress scrolling to refresh */
+  overscroll-behavior: none;
+
+  /* consistent line height across browsers */
+  line-height: 1.5;
+}
+
+html {
+  /* plain defaults */
+  font-family: monospace;
+  color: white;
+  background-color: black;
+}
+
+html, body {
+  /* full window container */
+  overflow: hidden;
+  position: absolute;
+  margin: 0;
+  padding: 0;
+  inset: 0;
+}
+
+#viewport {
+  /* default size */
+  width: 480px;
+  height: 768px;
+
+  /* centering */
+  position: relative;
+  left: 50%;
+  top: 50%;
+  translate: -50% -50%;
+
+  /* TODO: why... */
+  display: grid;
+  grid-template-areas: "main";
+}
