@@ -1,0 +1,213 @@
+<!doctype html>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+
+<!-- SHOW LOADING SPLASH -->
+<style>
+dialog#loading {
+  color: white; font-family: monospace;
+  border: none; outline: none; background: none;
+  &::backdrop { background: black; }
+  &[loading] { cursor: wait; }
+}
+</style>
+<dialog id="loading" loading>
+  <h1>loading...</h1>
+  <script>document.currentScript.parentElement.showModal()</script>
+</dialog>
+
+<!-- LOAD SCRIPTS AND STYLES -->
+<link rel="stylesheet" href="engine.css">
+<link rel="stylesheet" href="game.css">
+<script src="libs/peggy.min.js"></script>
+<script src="libs/howler.core.min.js"></script>
+<script src="engine.js"></script>
+<script src="game.js"></script>
+
+<!-- WAIT TO SETUP -->
+<script>document.addEventListener("DOMContentLoaded", setup_engine)</script>
+<script>document.addEventListener("DOMContentLoaded", setup_game)</script>
+<script>document.addEventListener("DOMContentLoaded", do_loading)</script>
+
+<!-- DEFINE DATA GRAMMARS -->
+<script id="grammars/videotome" type="text/pegjs">
+Script
+  = lines:(CommentLine / ScriptLine)+ { return lines.filter(line => line) }
+
+CommentLine
+  = "//" [^"\n"]* "\n" { }
+
+ScriptLine
+  = _ commands:Commands? text:DisplayText? "\n" _ { return {commands, text}; }
+
+Commands
+  = first:Command rest:CommandTail* " - " { return [first, ...rest] }
+
+CommandTail
+  = " " @Command
+
+Command
+  = [^" "\n\-]+ { return text(); }
+
+DisplayText
+  = [^\n]+ { return text(); }
+
+_  = [ \t\r\n]*
+
+__ = [ \t\r\n]+
+</script>
+
+<!--GAME CONTENT -->
+<script id="passages/main" type="text/videotome">
+démarrer
+#10
+the sun never sets
+for those
+that ride into it
+
+a domino game by
+
+QUARTERMILE
+#10
+ironically
+though i hate cars
+i realised i am one
+
+i live my life 
+as a car 
+as a driver
+
+my eyes on the road
+avoiding collision
+passing by
+passed by
+
+grumbling
+because nobody else
+knows how to drive
+#10
+i don't know
+where i'm going
+who does?
+
+i'm just driving
+into the infinite
+unattainable horizon
+
+i pass by 
+off ramps
+side roads
+service stations
+
+there will be time
+for all that
+after i get there
+
+and besides
+i fear those unknown roads
+it's safer on the highway
+#10
+i join convoys
+though more often 
+it feels easier
+to lead them 
+
+the front is also lonely
+still staring ahead
+into the empty road
+
+and wherever i am
+i'm still in this car
+still insulated
+in this metal shell
+
+i carry no passengers
+and radio chatter
+only takes you so far
+#10
+but in those convoys
+i see a glimmer
+of hope
+
+if i allow myself
+to follow
+i will find myself
+on new roads 
+
+paying attention
+to other people
+how they drive
+the roads they take
+
+expanding my world
+by just following
+
+this cautious driver
+can't improvise
+but they can learn
+by example
+
+show me enough roads
+and perhaps
+i can become
+president of this world
+#10
+the sun never sets
+for those
+that ride into it
+
+and neither
+does a new day
+ever dawn
+#end
+</script>
+
+<script>
+function test() {
+  console.log(document.currentScript.id);
+}
+</script>
+
+<script id="test">
+test();
+function make_road(distance) {
+  const parts = [];
+  for (let i = distance; i > 0; --i) {
+    parts.push("|", "|", "|", "|");
+
+    if (i <= 5 || i % 10 == 0)
+      parts.push(`M! - ${i * 10}`);
+    else
+      parts.push("|");
+  }
+  parts.push("|", "|", "|", "|");
+  return parts.join("\n");
+}
+
+function make_end() {
+  const parts = [];
+  parts.push("|", "|", "|", "|");
+  parts.push(`M! - NO END`);
+  for (let i = 0; i < 100; ++i)
+    parts.push("|", "|", "|", "|");
+  return parts.join("\n");
+}
+
+const dataElement = document.getElementById("passages/main");
+const macros = [
+  ["", make_road(0)],
+  ["#00", make_road(0)],
+  ["#01", make_road(1)],
+  ["#05", make_road(5)],
+  ["#10", make_road(10)],
+  ["#20", make_road(20)],
+  ["#end", make_end()],
+];
+
+for (const [tag, replace] of macros) {
+  dataElement.textContent = 
+    dataElement.textContent.replaceAll(`\n${tag}\n`, `\n${replace}\n`);
+}
+</script>
+
+<!-- LIVE RELOAD FIX -->
+</body>

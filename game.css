@@ -1,0 +1,211 @@
+#viewport {
+  width: 480px;
+  height: 768px;
+
+  /* background-color: color-mix(in srgb, green 25%, transparent); */
+
+  gap: .5rem;
+
+  --overdrive: max(var(--speed) - .75, 0);
+}
+
+.container {
+  grid-area: main;
+  contain: layout;
+
+  border-radius: 1rem;
+  overflow: hidden;
+
+  > * {
+    position: absolute;
+    inset: 0;
+  }
+}
+
+.scroller {
+  padding: 2rem;
+}
+
+.controls {
+  height: 140px;
+  
+  /* background-color: color-mix(in srgb, red 75%, transparent); */
+
+  /* margin: -.5rem 0; */
+  /* border: .5rem gray solid; */
+  /* border-left-color: darkslategray; */
+  /* border-bottom-color: darkslategray; */
+  border-radius: 1rem;
+
+  display: flex;
+  justify-content: space-around;
+  /* align-items: flex-start; */
+
+  & * {
+    display: grid;
+    align-content: center;
+    text-align: center;
+  }
+
+  perspective: 200px;
+
+  button {
+    font-family: inherit;
+    background: darkgrey;
+    font-size: 50px;
+
+    cursor: pointer;
+  }
+
+  button:active, button.active {
+    filter: brightness(50%);
+  }
+
+  .ui-border {
+    border: solid white .5rem;
+    border-left-color: grey;
+    border-bottom-color: grey;
+    border-radius: 1rem;
+  }
+}
+
+/* button.pedal {
+  background-image: url("images/pedal-brake.png");
+  background-size: contain;
+  align-self: center;
+} */
+
+.scroller {
+  flex-direction: column-reverse;
+  justify-content: flex-end;
+  padding-top: 30%;
+
+  /* background-image: url("images/BG_CAR_NORMAL.webp"); */
+  background-position: unset;
+  background-size: cover;
+
+  text-shadow: 1px 1px 2px black;
+}
+
+.scroller-bg-1 {
+  grid-area: main;
+  background-image: url("images/BG_CAR_NORMAL.webp");
+  background-position: unset;
+  background-size: cover;
+  z-index: -2;
+  /* border-radius: 1rem; */
+
+  animation: shake .1s .05s infinite alternate-reverse linear;
+
+  filter: saturate(.5);
+}
+
+.text {
+  opacity: var(--progress);
+  filter: blur(calc(var(--overdrive) * .75rem));
+  animation: shake2 .05s infinite alternate linear;
+}
+
+.scroller-bg-2 {
+  grid-area: main;
+  background-image: url("images/BG_CAR.webp");
+  background-position: unset;
+  background-size: cover;
+  z-index: -1;
+  /* border-radius: 1rem; */
+
+  opacity: var(--speed);
+  animation: shake .1s infinite alternate linear;
+}
+
+@keyframes shake {
+  from { 
+    transform: 
+      scale(calc(var(--speed) * .3 + 1)) 
+      rotate(calc(1deg * var(--overdrive, 0) + .1deg + .1deg * var(--speed))); 
+  }
+  to { 
+    transform: 
+      scale(calc(var(--speed) * .3 + 1)) 
+      rotate(calc(-1deg * var(--overdrive, 0) - .1deg - .1deg * var(--speed))); 
+  }
+}
+
+@keyframes shake2 {
+  from { 
+    transform: 
+      rotate(calc(1deg * var(--overdrive, 0) + .1deg + .1deg * var(--speed)))
+      rotateX(var(--rotate-x, 0)); 
+  }
+  to { 
+    transform: 
+      rotate(calc(-1deg * var(--overdrive, 0) - .1deg - .1deg * var(--speed)))
+      rotateX(var(--rotate-x, 0)); 
+  }
+}
+
+.speedo {
+  margin: 0 -20%;
+  height: 200%;
+  transform: translate(0, -50%);
+  z-index: 1;
+}
+
+button.pedal {
+  border: none;
+  background: none;
+
+  transform-origin: center 250%;
+
+  img {
+    pointer-events: none;
+  }
+
+  &:active, &.active {
+    filter: none;
+  }
+
+  &.active, &.button-held {
+    /* transform: rotateX(10deg); */
+    --rotate-x: 10deg;
+  } 
+
+  animation: shake2 .1s infinite alternate-reverse linear;
+}
+
+.pedal img {
+  height: 120px;
+}
+
+.text {
+  text-align: center;
+  /* align-self: center; */
+  font-size: 2rem;
+}
+
+.text.N {
+    color: #cfeef9;
+    text-align: left;
+}
+
+.text.S {
+    color: #eccedf;
+    text-align: right;
+}
+
+.text {
+    color: #FAF9F6;
+    text-align:  center;
+}
+
+.text.M {
+  width: 50%;
+  align-self: center;
+  background: #006E55;
+  border-radius: 1rem;
+  border: solid white 2px;
+  box-shadow: 2px 2px 4px black;
+  animation: none;
+
+  filter: blur(calc(var(--overdrive) * .75rem)) saturate(calc(1 - var(--speed) * .8));
+}
