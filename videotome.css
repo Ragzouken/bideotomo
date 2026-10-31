@@ -1,0 +1,21 @@
+#viewport {
+  gap: .5rem;
+}
+
+.container {
+  grid-area: main;
+  contain: layout;
+
+  border-radius: 1rem;
+  overflow: hidden;
+
+  > * {
+    position: absolute;
+    inset: 0;
+  }
+}
+
+.scroller {
+  padding: 2rem;
+  justify-content: space-around;
+}

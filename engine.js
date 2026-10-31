@@ -1,7 +1,3 @@
-function PUSH_ELEMENT(element) {
-  ENGINE.scroller.append(element);
-}
-
 let ENGINE = {};
 
 ENGINE.loadingDialog = document.getElementById("loading");
@@ -23,70 +19,6 @@ function PLAY_SOUND(id) {
   html("audio", { src: AUDIOS.get(id) }).play();
 }
 
-let AUTO;
-function AUTO_ON(interval=500) {
-  AUTO_OFF();
-  AUTO = setInterval(ADVANCE, interval);
-  ADVANCE();
-}
-
-function AUTO_OFF() {
-  if (!AUTO) return;
-
-  clearInterval(AUTO);
-  AUTO = undefined;
-}
-
-EVENTS.set("CLEARSCREEN", () => ENGINE.scroller.replaceChildren());
-
-async function ADVANCE() {
-  if (ENGINE.lines.length == 0) {
-    ENGINE.lines = ENGINE.data.slice(1);
-    ENGINE.scroller.replaceChildren();
-  }
-
-  const styles = [];
-  const line = ENGINE.lines.shift();
-  if (line.commands) {
-    for (const command of line.commands)
-      if (EVENTS.has(command))
-        await command.get(command)()
-      else if (command.endsWith("!"))
-        styles.push(command.slice(0, -1))
-      else if (command.startsWith("BG_"))
-        ENGINE.scroller.style.backgroundImage = `url(images/${command}.png)`;
-      else if (command.startsWith("MUS_"))
-        PLAY_MUSIC(command);
-      else if (command.startsWith("SFX_"))
-        PLAY_SOUND(command);
-  }
-  if (line.text)
-    PUSH_ELEMENT(html("span", { class: ["text", ...styles].join(" ") }, line.text));
-}
-
-async function setup_videotome() {
-  // parse main passage
-  const grammar = document.getElementById("grammars/videotome").textContent;
-  const parser = peggy.generate(grammar);
-  const passage = document.getElementById("passages/main").textContent;
-  const data = parser.parse(passage);
-
-  // add lines to engine
-  ENGINE.data = data;
-  ENGINE.lines = [];
-
-  // find resources to preload
-  const commands = [...new Set(data.flatMap(line => line.commands ?? []))];
-
-  commands
-  .filter(command => command.startsWith("BG_"))
-  .forEach(name => IMAGES.set(name, `images/${name}.png`));
-    
-  commands
-  .filter(command => command.startsWith("MUS_") || command.startsWith("SFX_"))
-  .forEach(name => AUDIOS.set(name, `music/${name}.m4a`));
-}
-
 async function setup_engine() {
   ENGINE.scroller = html("section", { class: "scroller" });
   ENGINE.container = html("section", { class: "container" }, ENGINE.scroller);
@@ -96,19 +28,17 @@ async function setup_engine() {
 
   repeat(() => scaleElementToParent(ENGINE.viewport));
 
-  setup_videotome();
+  document.addEventListener("click", (event) => {
+    event.preventDefault();
+    ADVANCE();
+  });
 
-  // document.addEventListener("click", (event) => {
-  //   event.preventDefault();
-  //   ADVANCE();
-  // });
-
-  // document.addEventListener("keydown", (event) => {
-  //   if (event.key != "ArrowRight" && event.key != " ")
-  //     return;
-  //   event.preventDefault();
-  //   ADVANCE();
-  // });
+  document.addEventListener("keydown", (event) => {
+    if (event.key != "ArrowRight" && event.key != " ")
+      return;
+    event.preventDefault();
+    ADVANCE();
+  });
 }
 
 async function do_loading() {

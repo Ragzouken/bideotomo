@@ -1,23 +1,20 @@
 <!doctype html>
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 
-<!-- INITIAL LOADING SPLASH -->
+<!-- LOADING SPLASH -->
 <style>dialog#loading { color: white; font-family: monospace; border: none; outline: none; background: none; &::backdrop { background: black; } &[loading] { cursor: wait; &::backdrop { background: black; } } }</style><dialog id="loading" loading><h1>loading...</h1><script>document.currentScript.parentElement.showModal()</script></dialog>
 
-<!-- LOAD SCRIPTS AND STYLES -->
-<link rel="stylesheet" href="engine.css">
-<link rel="stylesheet" href="game.css">
+<!-- ENGINE -->
 <script src="libs/peggy.min.js"></script>
 <script src="libs/howler.core.min.js"></script>
 <script src="engine.js"></script>
-<script src="game.js"></script>
-
-<!-- WAIT TO SETUP -->
+<link rel="stylesheet" href="engine.css">
 <script>document.addEventListener("DOMContentLoaded", setup_engine)</script>
-<script>document.addEventListener("DOMContentLoaded", setup_game)</script>
-<script>document.addEventListener("DOMContentLoaded", do_loading)</script>
 
-<!-- DEFINE DATA GRAMMARS -->
+<!-- VIDEOTOME -->
+<script src="videotome.js"></script>
+<link rel="stylesheet" href="videotome.css">
+<script>document.addEventListener("DOMContentLoaded", setup_videotome)</script>
 <script id="grammars/videotome" type="text/pegjs">
 Script
   = lines:(CommentLine / ScriptLine)+ { return lines.filter(line => line) }
@@ -45,149 +42,128 @@ _  = [ \t\r\n]*
 __ = [ \t\r\n]+
 </script>
 
+<!-- WAIT TO SETUP -->
+<script>document.addEventListener("DOMContentLoaded", do_loading)</script>
+
 <!--GAME CONTENT -->
+<link rel="stylesheet" href="game.css">
 <script id="passages/main" type="text/videotome">
 démarrer
-#10
-the sun never sets
-for those
-that ride into it
-
-a domino game by
-
-QUARTERMILE
-#10
-ironically
-though i hate cars
-i realised i am one
-
-i live my life 
-as a car 
-as a driver
-
-my eyes on the road
-avoiding collision
-passing by
-passed by
-
-grumbling
-because nobody else
-knows how to drive
-#10
-i don't know
-where i'm going
-who does?
-
-i'm just driving
-into the infinite
-unattainable horizon
-
-i pass by 
-off ramps
-side roads
-service stations
-
-there will be time
-for all that
-after i get there
-
-and besides
-i fear those unknown roads
-it's safer on the highway
-#10
-i join convoys
-though more often 
-it feels easier
-to lead them 
-
-the front is also lonely
-still staring ahead
-into the empty road
-
-and wherever i am
-i'm still in this car
-still insulated
-in this metal shell
-
-i carry no passengers
-and radio chatter
-only takes you so far
-#10
-but in those convoys
-i see a glimmer
-of hope
-
-if i allow myself
-to follow
-i will find myself
-on new roads 
-
-paying attention
-to other people
-how they drive
-the roads they take
-
-expanding my world
-by just following
-
-this cautious driver
-can't improvise
-but they can learn
-by example
-
-show me enough roads
-and perhaps
-i can become
-president of this world
-#10
-the sun never sets
-for those
-that ride into it
-
-and neither
-does a new day
-ever dawn
-#end
-</script>
-<script>
-function make_road(distance) {
-  const parts = [];
-  for (let i = distance; i > 0; --i) {
-    parts.push("|", "|", "|", "|");
-
-    if (i <= 5 || i % 10 == 0)
-      parts.push(`M! - ${i * 10}`);
-    else
-      parts.push("|");
-  }
-  parts.push("|", "|", "|", "|");
-  return parts.join("\n");
-}
-
-function make_end() {
-  const parts = [];
-  parts.push("|", "|", "|", "|");
-  parts.push(`M! - NO END`);
-  for (let i = 0; i < 100; ++i)
-    parts.push("|", "|", "|", "|");
-  return parts.join("\n");
-}
-
-const dataElement = document.getElementById("passages/main");
-const macros = [
-  ["", make_road(0)],
-  ["#00", make_road(0)],
-  ["#01", make_road(1)],
-  ["#05", make_road(5)],
-  ["#10", make_road(10)],
-  ["#20", make_road(20)],
-  ["#end", make_end()],
-];
-
-for (const [tag, replace] of macros) {
-  dataElement.textContent = 
-    dataElement.textContent.replaceAll(`\n${tag}\n`, `\n${replace}\n`);
-}
+MUS_TITLE - domino club presents
+HOT WET
+CLEARSCREEN - 
+MUS_DAY1 - the train pulls away and leaves me alone
+CLEARSCREEN BG_RAPESEED - the sun beats down 
+SFX_ECHOES - gentle breeze
+SFX_ECHOES - crickets chirp
+chirp
+chirp
+...
+nice and peaceful
+i raise the camera to my eye
+S! - NANCY? IS THAT YOU?
+through the viewfinder i see a woman 
+thirty or forty i'm bad with age
+older than me
+brown hair past her shoulders
+a sort of chestnut color
+one hand raised to shield her eyes
+loose white dress with slim blue stripes
+ends around her knees
+legs bare below but for a pair of sandals
+snap
+BG_SOPH - photograph
+N! - UM. MISS SOPHIE?
+smile
+S! - IT IS YOU! 
+S! - I WAS WORRIED YOU MISSED THE STATION
+N! - UH I MADE IT JUST FINE
+S! - THAT'S GREAT. I'LL SHOW YOU TO THE INN
+S! - IT'S NOT FAR TO WALK.
+S! - YOU MUST BE TIRED FROM TRAVELLING. BIG BAG!
+N! - NOT REALLY. IT'S JUST SITTING DOWN
+giggle
+she has a natural friendliness
+i
+do not
+short awkward dyke with dumb hair
+undercut growing out
+S! - I LIKE YOUR HAIR, NANCY
+S! - VERY PUNK ROCK
+N! - OH UH THANKS
+S! - I CAN NEATEN UP THE BACK FOR YOU IF YOU WANT?
+S! - OR IF YOU WANT A PROFESSIONAL THERE'S A BARBER
+S! - THREE VILLAGES OVER
+i laugh
+at the suggestion of a professional
+N! - WASN'T A PROFESSIONAL WHO DID IT THE FIRST TIME
+N! - JUST SOME DRUNK FRIENDS
+S! - AH. YOUTH IS SO AMAZING, ISN'T IT?
+stare at my feet
+BG_RAPESEED - walk in silence
+not awkward but not comfortable
+i look at the fields we pass
+hedges thin and low
+great swathes of yellow rape waving in the sun
+we arrive
+S! - HERE WE ARE :)
+S! - I HOPE IT'S NOT TOO RUSTIC FOR A CITY GIRL
+it's lovely
+BG_INN - large old house built half into a cave
+footpaths all ways
+small carpark, four cars
+the guests
+N! - IT LOOKS REALLY NICE
+S! - I'M GLAD. COME IN AND I'LL SHOW YOU YOUR ROOM
+we go
+S! - IT'S THE EARLY SEASON RIGHT NOW
+S! - NOT VERY BUSY
+S! - I WON'T BE ABLE TO PAY THAT MUCH
+N! - THAT'S OKAY. I AM
+burnt out
+dumb stupid fuck
+uni was too hard for you was it
+idiot
+can't just stare at the ceiling all day
+N! - JUST HAPPY TO HAVE A CHANGE OF PACE
+she laughs
+brushes hair back from her shoulder
+hickey
+little red mark on her collarbone
+S! - WELL IT'S DEFINITELY NOTHING LIKE THE CITY
+S! - THAT'S WHY PEOPLE COME HERE
+BG_ROOM S! - AND WE'RE HERE! THIS IS YOUR ROOM :)
+it's cosy
+single bed, wooden headboard
+desk and wardrobe
+window out onto the garden
+N! - UH. IT'S COSY
+S! - EHEHE THAT'S A POLITE WAY OF SAYING SMALL
+N! - UH - I MEANT IT! I LIKE SMALL SPACES
+N! - IT'S LIKE...
+i can touch every wall if i want to
+the snail seeks a shell its size
+five foot two, small shell
+N! - I CAN FILL UP THE SPACE WITHOUT FEELING SMALL
+N! - EMOTIONALLY, I MEAN
+N! - UHH Y'KNOW LIKE. VIBES. SORRY
+she giggles again
+finger to her mouth for a second
+S! - NO I GET WHAT YOU MEAN. 
+S! - I'LL LEAVE YOU TO GET SETTLED
+S! - CUP OF TEA IN TWENTY MINUTES?
+S! - I'LL SHOW AND TALK YOU THROUGH THE JOB
+inn housekeeper assistant
+what is there to really talk through?
+serve breakfast clean sheets vacuum
+smile little fake smile at guests
+well i'm not great at that last part
+N! - THAT WOULD BE GREAT THANKS
+N! - I'LL UH PUT MY STUFF AWAY
+she leaves
+i breathe
+BG_CLEAR - play the rest of the example game at <a href="https://dominoclub.itch.io/hot-wet"> dominoclub.itch.io/hot-wet</a>
+CLEARSCREEN - KEEP GOING TO RESTART
 </script>
 
 <!-- LIVE RELOAD FIX -->
