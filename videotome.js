@@ -29,13 +29,17 @@ function PUSH_ELEMENT(element) {
 }
 
 async function ADVANCE() {
-  if (VIDEOTOME.lines.length == 0) {
-    VIDEOTOME.lines = VIDEOTOME.data.slice(1);
-    VIDEOTOME.scroller.replaceChildren();
-  }
+  if (VIDEOTOME.lines.length == 0) RESET();
+  return RUN_LINE(VIDEOTOME.lines.shift());
+}
 
+async function RESET() {
+  VIDEOTOME.lines = VIDEOTOME.data.slice(1);
+  VIDEOTOME.scroller.replaceChildren();
+}
+
+async function RUN_LINE(line) {
   const styles = [];
-  const line = VIDEOTOME.lines.shift();
   if (line.commands) {
     for (const command of line.commands) {
       if (EVENTS.has(command))
@@ -43,15 +47,18 @@ async function ADVANCE() {
       else if (command.endsWith("!"))
         styles.push(command.slice(0, -1))
       else if (command.startsWith("BG_"))
-        VIDEOTOME.scroller.style.backgroundImage = `url(images/${command}.png)`;
+        VIDEOTOME.scroller.style.backgroundImage = `url(${IMAGES.get(command)})`;
       else if (command.startsWith("MUS_"))
         PLAY_MUSIC(command);
       else if (command.startsWith("SFX_"))
         PLAY_SOUND(command);
     }
   }
-  if (line.text)
-    PUSH_ELEMENT(html("span", { class: ["text", ...styles].join(" ") }, line.text));
+  if (line.text) {
+    const element = html("span", { class: ["text", ...styles].join(" ") });
+    element.innerHTML = line.text;
+    PUSH_ELEMENT(element);
+  }
 }
 
 async function setup_videotome() {
@@ -71,9 +78,11 @@ async function setup_videotome() {
 
   commands
   .filter(command => command.startsWith("BG_"))
-  .forEach(name => IMAGES.set(name, `images/${name}.png`));
+  .forEach(name => IMAGES.set(name, `assets/${name}`));
     
   commands
   .filter(command => command.startsWith("MUS_") || command.startsWith("SFX_"))
-  .forEach(name => AUDIOS.set(name, `music/${name}.m4a`));
+  .forEach(name => AUDIOS.set(name, `assets/${name}`));
+
+  RESET();
 }
