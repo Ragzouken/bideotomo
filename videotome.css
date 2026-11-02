@@ -19,3 +19,21 @@
   padding: 2rem;
   justify-content: space-around;
 }
+
+.choice {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-around;
+
+  button {
+    font-size: 3rem;
+
+    cursor: pointer;
+    border: none;
+    background: none;
+
+    &:hover {
+      transform: scale(1.5);
+    }
+  }
+}

@@ -21,6 +21,31 @@ function AUTO_OFF() {
   AUTO = undefined;
 }
 
+function RUN_PASSAGE(passage) {
+  VIDEOTOME.lines = [...PASSAGES.get(passage)];
+  // VIDEOTOME.scroller.replaceChildren();
+  ADVANCE(); 
+}
+
+function PUSH_TEXT(text, styles=[]) {
+    const element = html("span", { class: ["text", ...styles].join(" ") });
+    element.innerHTML = text;
+    PUSH_ELEMENT(element);
+}
+
+function PUSH_CHOICE(choices, styles=[]) {
+  function make_button(symbol, event) {
+    const button = html("button", {}, symbol);
+    button.addEventListener("click", () => RUN_PASSAGE(event));
+    button.addEventListener("click", suppress);
+    return button;
+  }
+
+  const buttons = choices.map(([symbol, event]) => make_button(symbol, event));
+  const element = html("form", { class: ["choice", ...styles].join(" ") }, ...buttons);
+  PUSH_ELEMENT(element);
+}
+
 const _PADDING = [html("div"), html("div"), html("div")];
 
 function PUSH_ELEMENT(element) {
@@ -29,17 +54,15 @@ function PUSH_ELEMENT(element) {
 }
 
 async function ADVANCE() {
-  if (VIDEOTOME.lines.length == 0) RESET();
-  return RUN_LINE(VIDEOTOME.lines.shift());
-}
-
-async function RESET() {
-  VIDEOTOME.lines = VIDEOTOME.data.slice(1);
-  VIDEOTOME.scroller.replaceChildren();
+  const line = VIDEOTOME.lines.shift();
+  if (line)
+    return RUN_LINE(line);
 }
 
 async function RUN_LINE(line) {
   const styles = [];
+  if (line.script)
+    eval(line.script);
   if (line.commands) {
     for (const command of line.commands) {
       if (EVENTS.has(command))
@@ -52,29 +75,34 @@ async function RUN_LINE(line) {
         PLAY_MUSIC(command);
       else if (command.startsWith("SFX_"))
         PLAY_SOUND(command);
+      else if (command.startsWith("X_"))
+        PUSH_CHOICE([["🔥", "passages/test"], ["🔥", "passages/main"], ["🔥", "passages/test"]]);
     }
   }
-  if (line.text) {
-    const element = html("span", { class: ["text", ...styles].join(" ") });
-    element.innerHTML = line.text;
-    PUSH_ELEMENT(element);
-  }
+  if (line.text)
+    PUSH_TEXT(line.text, styles);
 }
 
+const PASSAGES = new Map();
+
 async function setup_videotome() {
-  // parse main passage
+  // load videotome grammar
   const grammar = document.getElementById("grammars/videotome").textContent;
   const parser = peggy.generate(grammar);
-  const passage = document.getElementById("passages/main").textContent;
-  const data = parser.parse(passage);
 
-  // add lines to engine
-  VIDEOTOME.data = data;
-  VIDEOTOME.lines = [];
-  VIDEOTOME.scroller = ENGINE.scroller;
+  // parse passages
+  for (const element of document.querySelectorAll(`[type="text/videotome"]`))
+    PASSAGES.set(element.id, parser.parse(element.textContent));
 
   // find resources to preload
-  const commands = [...new Set(data.flatMap(line => line.commands ?? []))];
+  const commands = [...new Set(
+    [...PASSAGES.values()]
+    .flatMap(passage => passage)
+    .flatMap(line => line.commands ?? [])
+  )];
+
+  // setup
+  VIDEOTOME.scroller = ENGINE.scroller;
 
   commands
   .filter(command => command.startsWith("BG_"))
@@ -84,5 +112,19 @@ async function setup_videotome() {
   .filter(command => command.startsWith("MUS_") || command.startsWith("SFX_"))
   .forEach(name => AUDIOS.set(name, `assets/${name}`));
 
-  RESET();
+  // click to advance
+  document.addEventListener("click", (event) => {
+    event.preventDefault();
+    ADVANCE();
+  });
+
+  // right / space to advance
+  document.addEventListener("keydown", (event) => {
+    if (event.key != "ArrowRight" && event.key != " ")
+      return;
+    event.preventDefault();
+    ADVANCE();
+  });
+
+  RUN_PASSAGE("passages/main");
 }

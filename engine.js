@@ -27,18 +27,6 @@ async function setup_engine() {
   document.body.append(ENGINE.viewport);
 
   repeat(() => scaleElementToParent(ENGINE.viewport));
-
-  document.addEventListener("click", (event) => {
-    event.preventDefault();
-    ADVANCE();
-  });
-
-  document.addEventListener("keydown", (event) => {
-    if (event.key != "ArrowRight" && event.key != " ")
-      return;
-    event.preventDefault();
-    ADVANCE();
-  });
 }
 
 async function do_loading() {

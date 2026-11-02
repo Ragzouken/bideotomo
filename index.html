@@ -17,10 +17,13 @@
 <script>document.addEventListener("DOMContentLoaded", setup_videotome)</script>
 <script id="grammars/videotome" type="text/pegjs">
 Script
-  = lines:(CommentLine / ScriptLine)+ { return lines.filter(line => line) }
+  = lines:(CommentLine / CodeLine / ScriptLine)+ { return lines.filter(line => line) }
 
 CommentLine
   = "//" [^"\n"]* "\n" { }
+
+CodeLine
+  = _ "$" script:DisplayText "\n" { return { script } }
 
 ScriptLine
   = _ commands:Commands? text:DisplayText? "\n" _ { return {commands, text}; }
@@ -39,7 +42,7 @@ DisplayText
 
 _  = [ \t\r\n]*
 
-__ = [ \t\r\n]+
+__ = [ \t\r\n]
 </script>
 
 <!-- WAIT TO SETUP -->
@@ -47,8 +50,10 @@ __ = [ \t\r\n]+
 
 <!--GAME CONTENT -->
 <link rel="stylesheet" href="game.css">
+<script id="passages/test" type="text/videotome">
+asdf
+</script>
 <script id="passages/main" type="text/videotome">
-démarrer
 MUS_TITLE.mp3 - domino club presents
 HOT WET
 CLEARSCREEN - 
@@ -59,6 +64,7 @@ SFX_ECHOES.mp3 - crickets chirp
 chirp
 chirp
 ...
+$ PUSH_CHOICE([["🔥","passages/test"], ["💨", "passages/main"],["💦", "passages/test"]]);
 nice and peaceful
 i raise the camera to my eye
 S! - NANCY? IS THAT YOU?
