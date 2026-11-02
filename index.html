@@ -17,12 +17,18 @@
 <script>document.addEventListener("DOMContentLoaded", setup_videotome)</script>
 <script id="grammars/videotome" type="text/pegjs">
 Script
-  = lines:(CommentLine / CodeLine / ScriptLine)+ { return lines.filter(line => line) }
+  = lines:(CommentLine / ChoiceBlock / JSLine / ScriptLine)+ { return lines.filter(line => line) }
 
 CommentLine
   = "//" [^"\n"]* "\n" { }
 
-CodeLine
+ChoiceBlock
+  = "CHOICE[" "\n" choice:ChoiceLine+ "]\n" { return { choice } }
+
+ChoiceLine
+  = _ event:EventPath _ label:DisplayText "\n" { return { event, label } }
+
+JSLine
   = _ "$" script:DisplayText "\n" { return { script } }
 
 ScriptLine
@@ -36,6 +42,9 @@ CommandTail
 
 Command
   = [^" "\n\-]+ { return text(); }
+
+EventPath
+  = [A-Za-z0-9_/\-]+ { return text(); }
 
 DisplayText
   = [^\n]+ { return text(); }
@@ -62,9 +71,13 @@ CLEARSCREEN BG_RAPESEED.png - the sun beats down
 SFX_ECHOES.mp3 - gentle breeze
 SFX_ECHOES.mp3 - crickets chirp
 chirp
+CHOICE[
+  passages/test 🔥
+  passages/main 💨
+  passages/test 💦
+]
 chirp
 ...
-$ PUSH_CHOICE([["🔥","passages/test"], ["💨", "passages/main"],["💦", "passages/test"]]);
 nice and peaceful
 i raise the camera to my eye
 S! - NANCY? IS THAT YOU?

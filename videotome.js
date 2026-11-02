@@ -34,14 +34,14 @@ function PUSH_TEXT(text, styles=[]) {
 }
 
 function PUSH_CHOICE(choices, styles=[]) {
-  function make_button(symbol, event) {
-    const button = html("button", {}, symbol);
+  function make_button({ label, event }) {
+    const button = html("button", {}, label);
     button.addEventListener("click", () => RUN_PASSAGE(event));
     button.addEventListener("click", suppress);
     return button;
   }
 
-  const buttons = choices.map(([symbol, event]) => make_button(symbol, event));
+  const buttons = choices.map(make_button);
   const element = html("form", { class: ["choice", ...styles].join(" ") }, ...buttons);
   PUSH_ELEMENT(element);
 }
@@ -61,6 +61,8 @@ async function ADVANCE() {
 
 async function RUN_LINE(line) {
   const styles = [];
+  if (line.choice)
+    PUSH_CHOICE(line.choice);
   if (line.script)
     eval(line.script);
   if (line.commands) {
