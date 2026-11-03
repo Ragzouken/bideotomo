@@ -22,6 +22,11 @@ function AUTO_OFF() {
 }
 
 function RUN_PASSAGE(passage) {
+  if (passage == "stop") {
+    VIDEOTOME.lines = [];
+    return;
+  }
+
   if (!PASSAGES.has(passage)) {
     JUMP(passage);
     return;
