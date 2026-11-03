@@ -16,13 +16,19 @@
 <link rel="stylesheet" href="videotome.css">
 <script>document.addEventListener("DOMContentLoaded", setup_videotome)</script>
 <script id="grammars/videotome" type="text/pegjs">
+{{
+  function filter(line) {
+    return line && Object.values(line).filter(value => value).length > 0;
+  }
+}}
+
 {
   // strip end of line comments
   input = input.replace(/\/\/[^\n]*\n/g, "\n");
 }
 
 Script
-  = __ lines:ScriptLine |.., _ "\n"| __ { return lines.filter(block => block) }
+  = __ lines:ScriptLine |.., _ "\n"| __ { return lines.filter(filter); }
 
 ScriptLine
   = "." {}
@@ -75,19 +81,29 @@ MUS_DAY1.mp3 - the train pulls away and leaves me alone
 CLEARSCREEN BG_RAPESEED.png - the sun beats down 
 SFX_ECHOES.mp3 - gentle breeze
 SFX_ECHOES.mp3 - crickets chirp
-? passages/test bla
-? passages/main ass
-? dialogue shit
 chirp
 chirp
 _...
-_
-_
-okay
-# firstchoice
-? passages/test 🔥
-? passages/main 💨
-? dialogue 💦
+
+# repeat
+? horsey 🐎
+? woman 👸
+? pawn ♟️
+>repeat
+
+#horsey
+very aggressive
+>next
+
+#woman
+that blunders a woman
+>next
+
+#pawn
+nevermind.
+>next
+
+#next
 nice and peaceful
 i raise the camera to my eye
 S! - NANCY? IS THAT YOU?
