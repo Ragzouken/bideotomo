@@ -17,7 +17,7 @@
 <script>document.addEventListener("DOMContentLoaded", setup_videotome)</script>
 <script id="grammars/videotome" type="text/pegjs">
 Script
-  = __ block:ScriptLine _ rest:("\n" __ @ScriptLine)* __ { return [block, ...rest].filter(block => block) }
+  = __ lines:ScriptLine |.., _ "\n"| __ { return lines.filter(block => block) }
 
 ScriptLine
   = "." {}
@@ -25,26 +25,29 @@ ScriptLine
   / ">" _ event:EventPath { return { event } }
   / "#" _ label:EventPath { return { label } }
   / "$" _ script:FreeText { return { script } }
-  / ChoiceBlock
-  / escape:"_"? tags:Tags? text:FreeText? { return { tags, text, escape } }
+  / Choice
+  / TextLine
 
-ChoiceBlock
-  = first:ChoiceLine rest:("\n" __ @ChoiceLine)* { return { choice: [first, ...rest] } }
+Choice
+  = choice:ChoiceLine |1.., _ "\n"| { return { choice } }
 
 ChoiceLine
   = "?" _ event:EventPath _ label:FreeText { return { event, label } }
 
+TextLine
+  = escape:"_"? tags:Tags? text:FreeText? { return { tags, text, escape } }
+
 Tags
-  = first:Tag rest:(_ @Tag)* " - " { return [first, ...rest] }
+  = @Tag |1.., _ " "| " - "
 
 Tag
-  = [^ \n\-]+ { return text(); }
+  = $[^ \n\-]+
 
 EventPath
-  = [A-Za-z0-9_/\-]+ { return text(); }
+  = $[A-Za-z0-9_/\-]+
 
 FreeText
-  = [^\n]+ { return text(); }
+  = $[^\n]+
 
 _ = [ \t]*
 __ = [ \t\r\n]*
