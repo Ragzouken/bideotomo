@@ -106,21 +106,9 @@ async function RUN_LINE(line) {
 const PASSAGES = new Map();
 
 async function setup_videotome() {
-  // load videotome grammar
-  const grammar = document.getElementById("grammars/videotome").textContent;
-  const parser = peggy.generate(grammar, { grammarSource: "grammars/videotome" });
-
-  // parse passages
+  // find passages
   for (const element of document.querySelectorAll(`[type="text/videotome"]`))
-    try {
-      PASSAGES.set(element.id, parser.parse(element.textContent, { grammarSource: element.id }));
-    } catch (e) {
-      if (typeof e.format === "function") {
-        console.log(e.format([{ source: element.id, text: element.textContent }]));
-      } else {
-        throw e;
-      }
-    }
+    PASSAGES.set(element.id, PARSEDS.get(element.id));
 
   // find resources to preload
   const tags = [...new Set(
@@ -128,8 +116,6 @@ async function setup_videotome() {
     .flatMap(passage => passage)
     .flatMap(line => line.tags ?? [])
   )];
-
-  console.log(PASSAGES)
 
   // setup
   VIDEOTOME.scroller = ENGINE.scroller;

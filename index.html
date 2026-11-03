@@ -38,7 +38,7 @@ TextLine
   = escape:"_"? tags:Tags? text:FreeText? { return { tags, text, escape } }
 
 Tags
-  = @Tag |1.., _ " "| " - "
+  = @Tag |1.., _| " - "
 
 Tag
   = $[^ \n\-]+
@@ -58,11 +58,11 @@ __ = [ \t\r\n]*
 
 <!--GAME CONTENT -->
 <link rel="stylesheet" href="game.css">
-<script id="passages/test" type="text/videotome">
+<script id="passages/test" type="text/videotome" grammar="grammars/videotome">
 ass poo - asdf
 > passages/main
 </script>
-<script id="passages/main" type="text/videotome">
+<script id="passages/main" type="text/videotome" grammar="grammars/videotome">
 MUS_TITLE.mp3 - domino club presents
 HOT WET
 CLEARSCREEN - 

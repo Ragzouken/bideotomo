@@ -3,6 +3,9 @@ let ENGINE = {};
 ENGINE.loadingDialog = document.getElementById("loading");
 ENGINE.scroller = document.createElement("div");
 
+const PARSERS = new Map();
+const PARSEDS = new Map();
+
 const IMAGES = new Map();
 const AUDIOS = new Map();
 const EVENTS = new Map();
@@ -27,6 +30,46 @@ async function setup_engine() {
   document.body.append(ENGINE.viewport);
 
   repeat(() => scaleElementToParent(ENGINE.viewport));
+
+  load_grammars();
+  use_grammars();
+}
+
+function make_element_parser(source, filename="anonymous") {
+  try {
+    const parser = peggy.generate(source, { grammarSource: filename });
+    return (element) => {
+      try {
+        return parser.parse(element.textContent, { grammarSource: element.id });
+      } catch (e) {
+        if (typeof e.format === "function") {
+          console.log(e.format([{ source: element.id, text: element.textContent }]));
+        } else {
+          throw e;
+        }
+      }
+    }
+  } catch (e) {
+    if (typeof e.format === "function") {
+      console.log(e.format([{ source: filename, text: source }]));
+    } else {
+      throw e;
+    }
+  }
+}
+
+function load_grammars() {
+  for (const grammar of document.querySelectorAll(`script[type="text/pegjs"]`))
+    PARSERS.set(grammar.id, make_element_parser(grammar.textContent, grammar.id));
+}
+
+function use_grammars() {
+  for (const source of document.querySelectorAll(`script[grammar]`)) {
+    const grammar = source.getAttribute("grammar");
+    const parser = PARSERS.get(grammar);
+    if (parser)
+      PARSEDS.set(source.id, parser(source));
+  }
 }
 
 async function do_loading() {
@@ -209,3 +252,5 @@ function suppress(event) {
   event.preventDefault();
   event.stopPropagation();
 }
+
+
