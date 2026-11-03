@@ -16,12 +16,16 @@
 <link rel="stylesheet" href="videotome.css">
 <script>document.addEventListener("DOMContentLoaded", setup_videotome)</script>
 <script id="grammars/videotome" type="text/pegjs">
+{
+  // strip end of line comments
+  input = input.replace(/\/\/[^\n]*\n/g, "\n");
+}
+
 Script
   = __ lines:ScriptLine |.., _ "\n"| __ { return lines.filter(block => block) }
 
 ScriptLine
   = "." {}
-  / "//" _ FreeText? {}
   / ">" _ event:EventPath { return { event } }
   / "#" _ label:EventPath { return { label } }
   / "$" _ script:FreeText { return { script } }
@@ -63,9 +67,10 @@ ass poo - asdf
 > passages/main
 </script>
 <script id="passages/main" type="text/videotome" grammar="grammars/videotome">
+//test
 MUS_TITLE.mp3 - domino club presents
 HOT WET
-CLEARSCREEN - 
+CLEARSCREEN - //whatever
 MUS_DAY1.mp3 - the train pulls away and leaves me alone
 CLEARSCREEN BG_RAPESEED.png - the sun beats down 
 SFX_ECHOES.mp3 - gentle breeze
