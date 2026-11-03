@@ -17,41 +17,37 @@
 <script>document.addEventListener("DOMContentLoaded", setup_videotome)</script>
 <script id="grammars/videotome" type="text/pegjs">
 Script
-  = lines:(CommentLine / ChoiceBlock / JSLine / ScriptLine)+ { return lines.filter(line => line) }
-
-CommentLine
-  = "//" [^"\n"]* "\n" { }
-
-ChoiceBlock
-  = "CHOICE[" "\n" choice:ChoiceLine+ "]\n" { return { choice } }
-
-ChoiceLine
-  = _ event:EventPath _ label:DisplayText "\n" { return { event, label } }
-
-JSLine
-  = _ "$" script:DisplayText "\n" { return { script } }
+  = __ block:ScriptLine _ rest:("\n" __ @ScriptLine)* __ { return [block, ...rest].filter(block => block) }
 
 ScriptLine
-  = _ commands:Commands? text:DisplayText? "\n" _ { return {commands, text}; }
+  = "." {}
+  / "//" _ FreeText? {}
+  / ">" _ event:EventPath { return { event } }
+  / "#" _ label:EventPath { return { label } }
+  / "$" _ script:FreeText { return { script } }
+  / ChoiceBlock
+  / escape:"_"? tags:Tags? text:FreeText? { return { tags, text, escape } }
 
-Commands
-  = first:Command rest:CommandTail* " - " { return [first, ...rest] }
+ChoiceBlock
+  = first:ChoiceLine rest:("\n" __ @ChoiceLine)* { return { choice: [first, ...rest] } }
 
-CommandTail
-  = " " @Command
+ChoiceLine
+  = "?" _ event:EventPath _ label:FreeText { return { event, label } }
 
-Command
-  = [^" "\n\-]+ { return text(); }
+Tags
+  = first:Tag rest:(_ @Tag)* " - " { return [first, ...rest] }
+
+Tag
+  = [^ \n\-]+ { return text(); }
 
 EventPath
   = [A-Za-z0-9_/\-]+ { return text(); }
 
-DisplayText
+FreeText
   = [^\n]+ { return text(); }
 
-_  = [ \t\r\n]*
-
-__ = [ \t\r\n]
+_ = [ \t]*
+__ = [ \t\r\n]*
 </script>
 
 <!-- WAIT TO SETUP -->
@@ -60,7 +56,8 @@ __ = [ \t\r\n]
 <!--GAME CONTENT -->
 <link rel="stylesheet" href="game.css">
 <script id="passages/test" type="text/videotome">
-asdf
+ass poo - asdf
+> passages/main
 </script>
 <script id="passages/main" type="text/videotome">
 MUS_TITLE.mp3 - domino club presents
@@ -70,14 +67,19 @@ MUS_DAY1.mp3 - the train pulls away and leaves me alone
 CLEARSCREEN BG_RAPESEED.png - the sun beats down 
 SFX_ECHOES.mp3 - gentle breeze
 SFX_ECHOES.mp3 - crickets chirp
+? passages/test bla
+? passages/main ass
+? dialogue shit
 chirp
-CHOICE[
-  passages/test 🔥
-  passages/main 💨
-  passages/test 💦
-]
 chirp
-...
+_...
+_
+_
+okay
+# firstchoice
+? passages/test 🔥
+? passages/main 💨
+? dialogue 💦
 nice and peaceful
 i raise the camera to my eye
 S! - NANCY? IS THAT YOU?
@@ -91,6 +93,8 @@ loose white dress with slim blue stripes
 ends around her knees
 legs bare below but for a pair of sandals
 snap
+
+#dialogue
 BG_SOPH.png - photograph
 N! - UM. MISS SOPHIE?
 smile
