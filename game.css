@@ -19,3 +19,7 @@
 .text:not(:last-child) {
   color: #6A6A6A;
 }
+
+[test] {
+  color: red;
+}

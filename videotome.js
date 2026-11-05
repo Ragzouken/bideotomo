@@ -21,12 +21,15 @@ function AUTO_OFF() {
   AUTO = undefined;
 }
 
-function RUN_PASSAGE(passage) {
-  if (passage == "stop") {
-    VIDEOTOME.lines = [];
-    return;
-  }
+function STALL() {
+  VIDEOTOME.lines = [{}, ...VIDEOTOME.lines];
+}
 
+function CUT_PASSAGE() {
+  VIDEOTOME.lines = [];
+}
+
+function RUN_PASSAGE(passage) {
   if (!PASSAGES.has(passage)) {
     JUMP(passage);
     return;
@@ -34,11 +37,11 @@ function RUN_PASSAGE(passage) {
 
   VIDEOTOME.lines = [...PASSAGES.get(passage)];
   // VIDEOTOME.scroller.replaceChildren();
-  ADVANCE(); 
 }
 
-function PUSH_TEXT(text, styles=[]) {
-    const element = html("span", { class: ["text", ...styles].join(" ") });
+function PUSH_TEXT(text, styles=[], attrs=[]) {
+    const attrs_ = Object.fromEntries(attrs.map((name) => [name, ""]));
+    const element = html("span", { ...attrs_, class: ["text", ...styles].join(" ") });
     element.innerHTML = text;
     PUSH_ELEMENT(element);
 }
@@ -46,7 +49,7 @@ function PUSH_TEXT(text, styles=[]) {
 function PUSH_CHOICE(choices, styles=[]) {
   function make_button({ label, event }) {
     const button = html("button", {}, label);
-    button.addEventListener("click", () => RUN_PASSAGE(event));
+    button.addEventListener("click", () => RUN_EVENT_VT(event));
     button.addEventListener("click", suppress);
     return button;
   }
@@ -75,15 +78,26 @@ async function JUMP(label) {
     const index = passage.findIndex(line => line.label == label);
     if (index < 0) continue;
     VIDEOTOME.lines = [...passage.slice(index+1)];
-    ADVANCE();
     return;
+  }
+}
+
+async function RUN_EVENT_VT(id) {
+  if (EVENTS.has(id)) {
+    await RUN_EVENT(id);
+    await ADVANCE();
+  } else {
+    await RUN_PASSAGE(id);
+    await ADVANCE();
   }
 }
 
 async function RUN_LINE(line) {
   const styles = [];
-  if (line.event)
-    RUN_PASSAGE(line.event);
+  const attrs = [];
+  if (line.event) {
+    await RUN_EVENT_VT(line.event);
+  }
   if (line.choice)
     PUSH_CHOICE(line.choice);
   if (line.script)
@@ -100,20 +114,30 @@ async function RUN_LINE(line) {
         PLAY_MUSIC(tag);
       else if (tag.startsWith("SFX_"))
         PLAY_SOUND(tag);
-      else if (tag.startsWith("X_"))
-        PUSH_CHOICE([["🔥", "passages/test"], ["🔥", "passages/main"], ["🔥", "passages/test"]]);
     }
   }
+  if (line.style)
+    for (const style of line.style)
+      if (style.cls)
+        styles.push(style.cls);
+      else if (style.attr)
+        attrs.push(style.attr);
   if (line.text || line.escape)
-    PUSH_TEXT(line.text, styles);
+    PUSH_TEXT(line.text, styles, attrs);
 }
 
 const PASSAGES = new Map();
 
 async function setup_videotome() {
+  EVENTS.set("stop", CUT_PASSAGE);
+  EVENTS.set("stall", STALL);
+
   // find passages
   for (const element of document.querySelectorAll(`[type="text/videotome"]`))
     PASSAGES.set(element.id, PARSEDS.get(element.id));
+
+  for (const id of PASSAGES.keys())
+    EVENTS.set(id, RUN_PASSAGE(id));
 
   // find resources to preload
   const tags = [...new Set(

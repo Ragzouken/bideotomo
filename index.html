@@ -31,12 +31,16 @@ Script
   = __ lines:ScriptLine |.., _ "\n"| __ { return lines.filter(filter); }
 
 ScriptLine
-  = "." {}
-  / ">" _ event:EventPath { return { event } }
-  / "#" _ label:EventPath { return { label } }
+  = ">" _ event:EventPath { return { event } }
+  / ":" _ label:EventPath { return { label } }
   / "$" _ script:FreeText { return { script } }
+  / style:CSS |..| " " text:FreeText { return { style, text } }
   / Choice
   / TextLine
+
+CSS
+  = "[" attr:EventPath "]" { return { attr } }
+  / "." cls:EventPath { return { cls } }
 
 Choice
   = choice:ChoiceLine |1.., _ "\n"| { return { choice } }
@@ -73,6 +77,16 @@ ass poo - asdf
 > passages/main
 </script>
 <script id="passages/main" type="text/videotome" grammar="grammars/videotome">
+BG_RAPESEED.png - 
+>stall
+BG_SOPH.png - 
+>stall
+
+[test] THIS IS TEST!
+.S IT IS YOU! 
+.S I WAS WORRIED YOU MISSED THE STATION
+.N UH I MADE IT JUST FINE
+
 //test
 MUS_TITLE.mp3 - domino club presents
 HOT WET
@@ -85,25 +99,25 @@ chirp
 chirp
 _...
 
-# repeat
+:repeat
 ? horsey 🐎
 ? woman 👸
 ? pawn ♟️
 >stop
 
-#horsey
+:horsey
 very aggressive
 >stop
 
-#woman
+:woman
 that blunders a woman
 >stop
 
-#pawn
+:pawn
 nevermind.
 >next
 
-#next
+:next
 nice and peaceful
 i raise the camera to my eye
 S! - NANCY? IS THAT YOU?
@@ -118,7 +132,7 @@ ends around her knees
 legs bare below but for a pair of sandals
 snap
 
-#dialogue
+:dialogue
 BG_SOPH.png - photograph
 N! - UM. MISS SOPHIE?
 smile

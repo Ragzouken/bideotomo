@@ -10,6 +10,10 @@ const IMAGES = new Map();
 const AUDIOS = new Map();
 const EVENTS = new Map();
 
+function RUN_EVENT(id) {
+  return EVENTS.get(id)();
+}
+
 const MUSIC = html("audio", { loop: "true" });
 
 function PLAY_MUSIC(id) {
