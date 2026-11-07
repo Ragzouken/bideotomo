@@ -5,7 +5,20 @@ const VIDEOTOME = {
   lines: [],
 };
 
-EVENTS.set("CLEARSCREEN", () => VIDEOTOME.scroller.replaceChildren());
+const COMMANDS = new Map();
+
+function SET_COMMAND(id, stall, action) {
+  COMMANDS.set(id, (args) => { action(args); return stall });
+}
+
+SET_COMMAND("stall", true, () => {});
+SET_COMMAND("stop", true, () => CUT_PASSAGE());
+
+SET_COMMAND("sound", false, (id) => PLAY_SOUND(id));
+SET_COMMAND("music", false, (id) => PLAY_MUSIC(id));
+SET_COMMAND("jump", false, (id) => JUMP(id));
+SET_COMMAND("clear", false, () => VIDEOTOME.scroller.replaceChildren());
+SET_COMMAND("background", false, (id) => VIDEOTOME.scroller.style.backgroundImage = `url(${IMAGES.get(id)})`);
 
 let AUTO;
 function AUTO_ON(interval=500) {
@@ -19,10 +32,6 @@ function AUTO_OFF() {
 
   clearInterval(AUTO);
   AUTO = undefined;
-}
-
-function STALL() {
-  VIDEOTOME.lines = [{}, ...VIDEOTOME.lines];
 }
 
 function CUT_PASSAGE() {
@@ -47,9 +56,9 @@ function PUSH_TEXT(text, styles=[], attrs=[]) {
 }
 
 function PUSH_CHOICE(choices, styles=[]) {
-  function make_button({ label, event }) {
-    const button = html("button", {}, label);
-    button.addEventListener("click", () => RUN_EVENT_VT(event));
+  function make_button({ text, label }) {
+    const button = html("button", {}, text);
+    button.addEventListener("click", () => { JUMP(label); ADVANCE(); } );
     button.addEventListener("click", suppress);
     return button;
   }
@@ -67,10 +76,9 @@ function PUSH_ELEMENT(element) {
 }
 
 async function ADVANCE() {
-  let line = VIDEOTOME.lines.shift();
-  while (line && line.label) line = VIDEOTOME.lines.shift();
-  if (line)
-    return RUN_LINE(line);
+  let line;
+  do line = VIDEOTOME.lines.shift();
+  while (line && !await RUN_LINE(line))
 }
 
 async function JUMP(label) {
@@ -82,56 +90,35 @@ async function JUMP(label) {
   }
 }
 
-async function RUN_EVENT_VT(id) {
-  if (EVENTS.has(id)) {
-    await RUN_EVENT(id);
-    await ADVANCE();
-  } else {
-    await RUN_PASSAGE(id);
-    await ADVANCE();
-  }
-}
-
 async function RUN_LINE(line) {
   const styles = [];
   const attrs = [];
-  if (line.event) {
-    await RUN_EVENT_VT(line.event);
+
+  if (line.choice) {
+    await PUSH_CHOICE(line.choice);
+    return true;
   }
-  if (line.choice)
-    PUSH_CHOICE(line.choice);
   if (line.script)
     eval(line.script);
-  if (line.tags) {
-    for (const tag of line.tags) {
-      if (EVENTS.has(tag))
-        await EVENTS.get(tag)()
-      else if (tag.endsWith("!"))
-        styles.push(tag.slice(0, -1))
-      else if (tag.startsWith("BG_"))
-        VIDEOTOME.scroller.style.backgroundImage = `url(${IMAGES.get(tag)})`;
-      else if (tag.startsWith("MUS_"))
-        PLAY_MUSIC(tag);
-      else if (tag.startsWith("SFX_"))
-        PLAY_SOUND(tag);
-    }
-  }
+  if (line.command)
+    return COMMANDS.get(line.command.toLowerCase())(line.input);
   if (line.style)
     for (const style of line.style)
       if (style.cls)
         styles.push(style.cls);
       else if (style.attr)
         attrs.push(style.attr);
-  if (line.text || line.escape)
-    PUSH_TEXT(line.text, styles, attrs);
+  if (line.text || line.escape) {
+    await PUSH_TEXT(line.text, styles, attrs);
+    return true;
+  }
+
+  return false;
 }
 
 const PASSAGES = new Map();
 
 async function setup_videotome() {
-  EVENTS.set("stop", CUT_PASSAGE);
-  EVENTS.set("stall", STALL);
-
   // find passages
   for (const element of document.querySelectorAll(`[type="text/videotome"]`))
     PASSAGES.set(element.id, PARSEDS.get(element.id));
@@ -143,7 +130,7 @@ async function setup_videotome() {
   const tags = [...new Set(
     [...PASSAGES.values()]
     .flatMap(passage => passage)
-    .flatMap(line => line.tags ?? [])
+    .flatMap(line => line.input ?? [])
   )];
 
   // setup

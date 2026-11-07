@@ -31,37 +31,30 @@ Script
   = __ lines:ScriptLine |.., _ "\n"| __ { return lines.filter(filter); }
 
 ScriptLine
-  = ">" _ event:EventPath { return { event } }
-  / ":" _ label:EventPath { return { label } }
-  / "$" _ script:FreeText { return { script } }
-  / style:CSS |..| " " text:FreeText { return { style, text } }
+  = ":" _ label:Name { return { label } }
+  / "!" _ command:Name _ input:TextLine? { return { command, input: input?.trim() } }
+  / "$" _ script:TextLine { return { script } }
   / Choice
-  / TextLine
+  / Dialogue
 
-CSS
-  = "[" attr:EventPath "]" { return { attr } }
-  / "." cls:EventPath { return { cls } }
+Dialogue
+  = style:Selector |..| _ text:TextLine? { return { style, text } }
 
 Choice
   = choice:ChoiceLine |1.., _ "\n"| { return { choice } }
 
 ChoiceLine
-  = "?" _ event:EventPath _ label:FreeText { return { event, label } }
+  = "?" _ label:Name _ text:TextLine { return { label, text } }
+
+Name
+  = $[A-Za-z0-9_\-]+
 
 TextLine
-  = escape:"_"? tags:Tags? text:FreeText? { return { tags, text, escape } }
-
-Tags
-  = @Tag |1.., _| " - "
-
-Tag
-  = $[^ \n\-]+
-
-EventPath
-  = $[A-Za-z0-9_/\-]+
-
-FreeText
   = $[^\n]+
+
+Selector
+  = "[" attr:Name "]" { return { attr } }
+  / "." cls:Name { return { cls } }
 
 _ = [ \t]*
 __ = [ \t\r\n]*
@@ -72,55 +65,47 @@ __ = [ \t\r\n]*
 
 <!--GAME CONTENT -->
 <link rel="stylesheet" href="game.css">
-<script id="passages/test" type="text/videotome" grammar="grammars/videotome">
-ass poo - asdf
-> passages/main
-</script>
 <script id="passages/main" type="text/videotome" grammar="grammars/videotome">
-BG_RAPESEED.png - 
->stall
-BG_SOPH.png - 
->stall
+:start
+!music MUS_TITLE.mp3
 
-[test] THIS IS TEST!
-.S IT IS YOU! 
-.S I WAS WORRIED YOU MISSED THE STATION
-.N UH I MADE IT JUST FINE
-
-//test
-MUS_TITLE.mp3 - domino club presents
+domino club presents
 HOT WET
-CLEARSCREEN - //whatever
-MUS_DAY1.mp3 - the train pulls away and leaves me alone
-CLEARSCREEN BG_RAPESEED.png - the sun beats down 
-SFX_ECHOES.mp3 - gentle breeze
-SFX_ECHOES.mp3 - crickets chirp
+
+!clear
+!music MUS_DAY1.mp3
+
+the train pulls away and leaves me alone
+
+!clear
+!background BG_RAPESEED.png
+
+the sun beats down 
+
+!sound SFX_ECHOES.mp3
+
+gentle breeze
+
+!sound SFX_ECHOES.mp3
+
+crickets chirp
 chirp
 chirp
-_...
 
 :repeat
 ? horsey 🐎
-? woman 👸
-? pawn ♟️
->stop
+? next 👸
+? dialogue ♟️
+!stop
 
 :horsey
 very aggressive
->stop
-
-:woman
-that blunders a woman
->stop
-
-:pawn
-nevermind.
->next
+!stop
 
 :next
 nice and peaceful
 i raise the camera to my eye
-S! - NANCY? IS THAT YOU?
+.S NANCY? IS THAT YOU?
 through the viewfinder i see a woman 
 thirty or forty i'm bad with age
 older than me
@@ -133,98 +118,104 @@ legs bare below but for a pair of sandals
 snap
 
 :dialogue
-BG_SOPH.png - photograph
-N! - UM. MISS SOPHIE?
+!background BG_SOPH.png
+photograph
+.N UM. MISS SOPHIE?
 smile
-S! - IT IS YOU! 
-S! - I WAS WORRIED YOU MISSED THE STATION
-N! - UH I MADE IT JUST FINE
-S! - THAT'S GREAT. I'LL SHOW YOU TO THE INN
-S! - IT'S NOT FAR TO WALK.
-S! - YOU MUST BE TIRED FROM TRAVELLING. BIG BAG!
-N! - NOT REALLY. IT'S JUST SITTING DOWN
+.S IT IS YOU! 
+.S I WAS WORRIED YOU MISSED THE STATION
+.N UH I MADE IT JUST FINE
+.S THAT'S GREAT. I'LL SHOW YOU TO THE INN
+.S IT'S NOT FAR TO WALK.
+.S YOU MUST BE TIRED FROM TRAVELLING. BIG BAG!
+.N NOT REALLY. IT'S JUST SITTING DOWN
 giggle
 she has a natural friendliness
 i
 do not
 short awkward dyke with dumb hair
 undercut growing out
-S! - I LIKE YOUR HAIR, NANCY
-S! - VERY PUNK ROCK
-N! - OH UH THANKS
-S! - I CAN NEATEN UP THE BACK FOR YOU IF YOU WANT?
-S! - OR IF YOU WANT A PROFESSIONAL THERE'S A BARBER
-S! - THREE VILLAGES OVER
+.S I LIKE YOUR HAIR, NANCY
+.S VERY PUNK ROCK
+.N OH UH THANKS
+.S I CAN NEATEN UP THE BACK FOR YOU IF YOU WANT?
+.S OR IF YOU WANT A PROFESSIONAL THERE'S A BARBER
+.S THREE VILLAGES OVER
 i laugh
 at the suggestion of a professional
-N! - WASN'T A PROFESSIONAL WHO DID IT THE FIRST TIME
-N! - JUST SOME DRUNK FRIENDS
-S! - AH. YOUTH IS SO AMAZING, ISN'T IT?
+.N WASN'T A PROFESSIONAL WHO DID IT THE FIRST TIME
+.N JUST SOME DRUNK FRIENDS
+.S AH. YOUTH IS SO AMAZING, ISN'T IT?
 stare at my feet
-BG_RAPESEED.png - walk in silence
+!background BG_RAPESEED.png
+walk in silence
 not awkward but not comfortable
 i look at the fields we pass
 hedges thin and low
 great swathes of yellow rape waving in the sun
 we arrive
-S! - HERE WE ARE :)
-S! - I HOPE IT'S NOT TOO RUSTIC FOR A CITY GIRL
+.S HERE WE ARE :)
+.S I HOPE IT'S NOT TOO RUSTIC FOR A CITY GIRL
 it's lovely
 BG_INN.png - large old house built half into a cave
 footpaths all ways
 small carpark, four cars
 the guests
-N! - IT LOOKS REALLY NICE
-S! - I'M GLAD. COME IN AND I'LL SHOW YOU YOUR ROOM
+.N IT LOOKS REALLY NICE
+.S I'M GLAD. COME IN AND I'LL SHOW YOU YOUR ROOM
 we go
-S! - IT'S THE EARLY SEASON RIGHT NOW
-S! - NOT VERY BUSY
-S! - I WON'T BE ABLE TO PAY THAT MUCH
-N! - THAT'S OKAY. I AM
+.S IT'S THE EARLY SEASON RIGHT NOW
+.S NOT VERY BUSY
+.S I WON'T BE ABLE TO PAY THAT MUCH
+.N THAT'S OKAY. I AM
 burnt out
 dumb stupid fuck
 uni was too hard for you was it
 idiot
 can't just stare at the ceiling all day
-N! - JUST HAPPY TO HAVE A CHANGE OF PACE
+.N JUST HAPPY TO HAVE A CHANGE OF PACE
 she laughs
 brushes hair back from her shoulder
 hickey
 little red mark on her collarbone
-S! - WELL IT'S DEFINITELY NOTHING LIKE THE CITY
-S! - THAT'S WHY PEOPLE COME HERE
-BG_ROOM.png S! - AND WE'RE HERE! THIS IS YOUR ROOM :)
+.S WELL IT'S DEFINITELY NOTHING LIKE THE CITY
+.S THAT'S WHY PEOPLE COME HERE
+!background BG_ROOM.png
+.S AND WE'RE HERE! THIS IS YOUR ROOM :)
 it's cosy
 single bed, wooden headboard
 desk and wardrobe
 window out onto the garden
-N! - UH. IT'S COSY
-S! - EHEHE THAT'S A POLITE WAY OF SAYING SMALL
-N! - UH - I MEANT IT! I LIKE SMALL SPACES
-N! - IT'S LIKE...
+.N UH. IT'S COSY
+.S EHEHE THAT'S A POLITE WAY OF SAYING SMALL
+.N UH - I MEANT IT! I LIKE SMALL SPACES
+.N IT'S LIKE...
 i can touch every wall if i want to
 the snail seeks a shell its size
 five foot two, small shell
-N! - I CAN FILL UP THE SPACE WITHOUT FEELING SMALL
-N! - EMOTIONALLY, I MEAN
-N! - UHH Y'KNOW LIKE. VIBES. SORRY
+.N I CAN FILL UP THE SPACE WITHOUT FEELING SMALL
+.N EMOTIONALLY, I MEAN
+.N UHH Y'KNOW LIKE. VIBES. SORRY
 she giggles again
 finger to her mouth for a second
-S! - NO I GET WHAT YOU MEAN. 
-S! - I'LL LEAVE YOU TO GET SETTLED
-S! - CUP OF TEA IN TWENTY MINUTES?
-S! - I'LL SHOW AND TALK YOU THROUGH THE JOB
+.S NO I GET WHAT YOU MEAN. 
+.S I'LL LEAVE YOU TO GET SETTLED
+.S CUP OF TEA IN TWENTY MINUTES?
+.S I'LL SHOW AND TALK YOU THROUGH THE JOB
 inn housekeeper assistant
 what is there to really talk through?
 serve breakfast clean sheets vacuum
 smile little fake smile at guests
 well i'm not great at that last part
-N! - THAT WOULD BE GREAT THANKS
-N! - I'LL UH PUT MY STUFF AWAY
+.N THAT WOULD BE GREAT THANKS
+.N I'LL UH PUT MY STUFF AWAY
 she leaves
 i breathe
-BG_CLEAR.png - play the rest of the example game at <a href="https://dominoclub.itch.io/hot-wet"> dominoclub.itch.io/hot-wet</a>
-CLEARSCREEN - KEEP GOING TO RESTART
+!background BG_CLEAR.png
+play the rest of the example game at <a href="https://dominoclub.itch.io/hot-wet"> dominoclub.itch.io/hot-wet</a>
+!clear
+KEEP GOING TO RESTART
+!jump start
 </script>
 
 <!-- LIVE RELOAD FIX -->
