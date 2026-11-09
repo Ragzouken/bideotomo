@@ -42,13 +42,4 @@ html, body {
   line-height: 1.5;
   font-family: monospace;
   color: white;
-
-  /* layout */
-  display: grid;
-  grid-template-areas: 
-    "main"
-    "foot";
-  grid-template-rows: 1fr min-content;
-
-  background-position: center;
 }

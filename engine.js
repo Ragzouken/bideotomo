@@ -199,7 +199,7 @@ class HoldableButton extends EventTarget {
 
   bindKey(key) {
     document.addEventListener("keydown", (event) => {
-      if (event.key != key)
+      if (event.key != key || event.repeat)
         return;
       event.preventDefault();
       this.press(key);

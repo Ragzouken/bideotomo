@@ -1,19 +1,60 @@
-#viewport {
-  gap: .5rem;
+:root {
+  font-size: 32px;
+
+  color: #FAF9F6;
+  text-shadow: 2px 2px 4px black;
 }
 
-.container {
-  grid-area: main;
-  contain: layout;
-
+#viewport {
   border-radius: 1rem;
-  padding: 1rem;
+  overflow: hidden;
 
   display: grid;
-  grid-template-rows: 1fr 1fr 1fr;
+  grid-template-areas: 
+    "main"
+    "foot";
+  grid-template-rows: 1fr min-content;
+
+  background-position: center;
+}
+
+#container {
+  grid-area: main;
+
+  padding: 1em;
+
+  display: grid;
+  grid-template-rows: repeat(3, 1fr);
   align-items: center;
 
   background-position: center;
+}
+
+#controls {
+  grid-area: foot;
+
+  display: grid;
+
+  height: 96px;
+
+  button {
+    font-size: 48px;
+    color: white;
+
+    cursor: pointer;    
+    border: none;
+    background: radial-gradient(ellipse farthest-side at bottom, black, transparent);
+    
+    opacity: 25%;
+
+    &:hover {
+      opacity: 75%;
+    }
+
+    &.button-held {
+      opacity: 100%;
+    }
+  }
 }
 
 .choice {
@@ -22,7 +63,7 @@
   justify-content: space-around;
 
   button {
-    font-size: 3rem;
+    font-size: 2em;
 
     cursor: pointer;
     border: none;

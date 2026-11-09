@@ -11,14 +11,13 @@ function SET_COMMAND(id, stall, action) {
   COMMANDS.set(id, (args) => { action(args); return stall });
 }
 
-SET_COMMAND("stall", true, () => {});
+SET_COMMAND("wait", true, () => {});
 SET_COMMAND("stop", true, () => CUT_PASSAGE());
-
 SET_COMMAND("sound", false, (id) => PLAY_SOUND(id));
 SET_COMMAND("music", false, (id) => PLAY_MUSIC(id));
 SET_COMMAND("jump", false, (id) => JUMP(id));
 SET_COMMAND("clear", false, () => VIDEOTOME.container.replaceChildren());
-SET_COMMAND("background", false, (id) => VIDEOTOME.container.style.backgroundImage = `url(${IMAGES.get(id)})`);
+SET_COMMAND("background", false, (id) => SET_BACKGROUND(id));
 
 let AUTO;
 function AUTO_ON(interval=500) {
@@ -45,6 +44,10 @@ function RUN_PASSAGE(passage) {
   }
 
   VIDEOTOME.lines = [...PASSAGES.get(passage)];
+}
+
+function SET_BACKGROUND(id) {
+  ENGINE.viewport.style.backgroundImage = `url(${IMAGES.get(id) ?? ""})`;
 }
 
 function PUSH_TEXT(text, styles=[], attrs=[]) {
@@ -117,6 +120,8 @@ async function RUN_LINE(line) {
 
 const PASSAGES = new Map();
 
+const ADVANCE_KEYS = new Set(["ArrowRight", " ", "Enter"]);
+
 async function setup_videotome() {
   // find passages
   for (const element of document.querySelectorAll(`[type="text/videotome"]`))
@@ -133,9 +138,16 @@ async function setup_videotome() {
   )];
 
   // setup
-  VIDEOTOME.container = html("section", { class: "container" });
-  VIDEOTOME.controls = html("section", { class: "controls" });
+  VIDEOTOME.container = html("section", { id: "container" });
+  VIDEOTOME.controls = html("section", { id: "controls" });
   ENGINE.viewport.append(VIDEOTOME.container, VIDEOTOME.controls);
+
+  const auto = new HoldableButton(html("button", {}, "⮟"));
+  auto.addEventListener("pressed", () => AUTO_ON());
+  auto.addEventListener("released", () => AUTO_OFF());
+  for (const key of ADVANCE_KEYS)
+    auto.bindKey(key);
+  VIDEOTOME.controls.append(auto.element);
 
   tags
   .filter(tag => tag.startsWith("BG_"))
@@ -146,17 +158,14 @@ async function setup_videotome() {
   .forEach(name => AUDIOS.set(name, `assets/${name}`));
 
   // click to advance
-  document.addEventListener("click", (event) => {
+  VIDEOTOME.container.addEventListener("pointerdown", (event) => {
     event.preventDefault();
-    ADVANCE();
+    auto.press();
   });
 
-  // right / space to advance
-  document.addEventListener("keydown", (event) => {
-    if (event.key != "ArrowRight" && event.key != " ")
-      return;
+  VIDEOTOME.container.addEventListener("pointerup", (event) => {
     event.preventDefault();
-    ADVANCE();
+    auto.release();
   });
 
   RUN_PASSAGE("passages/main");

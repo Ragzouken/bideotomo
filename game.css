@@ -1,8 +1,11 @@
+#controls {
+  /* display: none; */
+}
+
 .text {
   color: #FAF9F6;
   text-align: center;
   
-  font-size: 2rem;
   text-shadow: 2px 2px 4px black;
 }
 
