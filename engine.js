@@ -1,7 +1,6 @@
 let ENGINE = {};
 
 ENGINE.loadingDialog = document.getElementById("loading");
-ENGINE.scroller = document.createElement("div");
 
 const PARSERS = new Map();
 const PARSEDS = new Map();
@@ -14,12 +13,12 @@ function RUN_EVENT(id) {
   return EVENTS.get(id)();
 }
 
-const MUSIC = html("audio", { loop: "true" });
+ENGINE.musicElement = html("audio", { loop: "true" });
 
 function PLAY_MUSIC(id) {
-  MUSIC.pause();
-  MUSIC.src = AUDIOS.get(id);
-  MUSIC.play();
+  ENGINE.musicElement.pause();
+  ENGINE.musicElement.src = AUDIOS.get(id);
+  ENGINE.musicElement.play();
 }
 
 function PLAY_SOUND(id) {
@@ -27,12 +26,8 @@ function PLAY_SOUND(id) {
 }
 
 async function setup_engine() {
-  ENGINE.scroller = html("section", { class: "scroller" });
-  ENGINE.container = html("section", { class: "container" }, ENGINE.scroller);
-  ENGINE.controls = html("section", { class: "controls" })
-  ENGINE.viewport = html("div", { id: "viewport" }, ENGINE.container, ENGINE.controls);
+  ENGINE.viewport = html("div", { id: "viewport" });
   document.body.append(ENGINE.viewport);
-
   repeat(() => scaleElementToParent(ENGINE.viewport));
 
   load_grammars();
@@ -257,4 +252,10 @@ function suppress(event) {
   event.stopPropagation();
 }
 
+const _AsyncFunction = Object.getPrototypeOf(async function(){}).constructor
+
+function async_eval(code) {
+  script = _AsyncFunction(code)
+  return script.call();
+}
 

@@ -7,17 +7,13 @@
   contain: layout;
 
   border-radius: 1rem;
-  overflow: hidden;
+  padding: 1rem;
 
-  > * {
-    position: absolute;
-    inset: 0;
-  }
-}
+  display: grid;
+  grid-template-rows: 1fr 1fr 1fr;
+  align-items: center;
 
-.scroller {
-  padding: 2rem;
-  justify-content: space-around;
+  background-position: center;
 }
 
 .choice {

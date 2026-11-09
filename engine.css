@@ -52,19 +52,3 @@ html, body {
 
   background-position: center;
 }
-
-.scroller {
-  grid-area: main;
-
-  display: flex;
-  flex-direction: column;
-  justify-content: end;
-  overflow: hidden;
-
-  border-radius: 1rem;
-
-  padding: 1rem;
-  gap: 1rem;
-
-  background-position: center;
-}

@@ -17,8 +17,8 @@ SET_COMMAND("stop", true, () => CUT_PASSAGE());
 SET_COMMAND("sound", false, (id) => PLAY_SOUND(id));
 SET_COMMAND("music", false, (id) => PLAY_MUSIC(id));
 SET_COMMAND("jump", false, (id) => JUMP(id));
-SET_COMMAND("clear", false, () => VIDEOTOME.scroller.replaceChildren());
-SET_COMMAND("background", false, (id) => VIDEOTOME.scroller.style.backgroundImage = `url(${IMAGES.get(id)})`);
+SET_COMMAND("clear", false, () => VIDEOTOME.container.replaceChildren());
+SET_COMMAND("background", false, (id) => VIDEOTOME.container.style.backgroundImage = `url(${IMAGES.get(id)})`);
 
 let AUTO;
 function AUTO_ON(interval=500) {
@@ -45,7 +45,6 @@ function RUN_PASSAGE(passage) {
   }
 
   VIDEOTOME.lines = [...PASSAGES.get(passage)];
-  // VIDEOTOME.scroller.replaceChildren();
 }
 
 function PUSH_TEXT(text, styles=[], attrs=[]) {
@@ -71,8 +70,8 @@ function PUSH_CHOICE(choices, styles=[]) {
 const _PADDING = [html("div"), html("div"), html("div")];
 
 function PUSH_ELEMENT(element) {
-  VIDEOTOME.scroller.append(element);
-  VIDEOTOME.scroller.replaceChildren(...[..._PADDING, ...VIDEOTOME.scroller.children].slice(-3));
+  VIDEOTOME.container.append(element);
+  VIDEOTOME.container.replaceChildren(...[..._PADDING, ...VIDEOTOME.container.children].slice(-3));
 }
 
 async function ADVANCE() {
@@ -99,7 +98,7 @@ async function RUN_LINE(line) {
     return true;
   }
   if (line.script)
-    eval(line.script);
+    return await async_eval(line.script);
   if (line.command)
     return COMMANDS.get(line.command.toLowerCase())(line.input);
   if (line.style)
@@ -134,7 +133,9 @@ async function setup_videotome() {
   )];
 
   // setup
-  VIDEOTOME.scroller = ENGINE.scroller;
+  VIDEOTOME.container = html("section", { class: "container" });
+  VIDEOTOME.controls = html("section", { class: "controls" });
+  ENGINE.viewport.append(VIDEOTOME.container, VIDEOTOME.controls);
 
   tags
   .filter(tag => tag.startsWith("BG_"))
