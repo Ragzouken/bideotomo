@@ -39,12 +39,14 @@
 
   button {
     font-size: 48px;
-    color: white;
+    color: inherit;
 
     cursor: pointer;    
     border: none;
     background: radial-gradient(ellipse farthest-side at bottom, black, transparent);
-    
+
+    transition: opacity .75s;
+
     opacity: 25%;
 
     &:hover {
