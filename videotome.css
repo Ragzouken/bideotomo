@@ -7,7 +7,7 @@
 
 #viewport {
   border-radius: 1rem;
-  overflow: hidden;
+  /* overflow: hidden; */
 
   display: grid;
   grid-template-areas: 
@@ -31,11 +31,16 @@
 }
 
 #controls {
-  grid-area: foot;
+  grid-area: main;
+  align-self: end;
 
   display: grid;
 
   height: 96px;
+
+  position: absolute;
+  inset: 0;
+  inset-block-start: unset;
 
   button {
     font-size: 48px;
@@ -55,6 +60,12 @@
 
     &.button-held {
       opacity: 100%;
+    }
+
+    img {
+      filter: invert();
+      width: 32px;
+      opacity: 50%;
     }
   }
 }

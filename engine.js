@@ -80,7 +80,7 @@ async function do_loading() {
   let done = 0;
   function complete() {
     done += 1;
-    ENGINE.loadingDialog.replaceChildren(html("h1", {}, `LOADING (${done}/${loads.length})`));
+    ENGINE.loadingDialog.replaceChildren(`LOADING (${done}/${loads.length})`);
   }
 
   try {
@@ -92,7 +92,7 @@ async function do_loading() {
   }
 
   ENGINE.loadingDialog.removeAttribute("loading");
-  ENGINE.loadingDialog.replaceChildren(html("h1", {}, "tap or click to play"));
+  ENGINE.loadingDialog.replaceChildren("tap or click to play");
   ENGINE.loadingDialog.addEventListener("click", () => ENGINE.loadingDialog.close(), { once: true });
 }
 

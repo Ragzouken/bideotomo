@@ -141,8 +141,9 @@ async function setup_videotome() {
   VIDEOTOME.container = html("section", { id: "container" });
   VIDEOTOME.controls = html("section", { id: "controls" });
   ENGINE.viewport.append(VIDEOTOME.container, VIDEOTOME.controls);
+  document.body.append(VIDEOTOME.controls);
 
-  const auto = new HoldableButton(html("button", {}, "⮟"));
+  const auto = new HoldableButton(html("button", {}, html("img", { src: "assets/chevron-double-down.svg" })));
   auto.addEventListener("pressed", () => AUTO_ON());
   auto.addEventListener("released", () => AUTO_OFF());
   for (const key of ADVANCE_KEYS)
