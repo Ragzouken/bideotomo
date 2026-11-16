@@ -170,4 +170,6 @@ async function setup_videotome() {
   });
 
   RUN_PASSAGE("passages/main");
+
+  ENGINE.loadingDialog.addEventListener("close", () => ADVANCE());
 }
