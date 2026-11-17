@@ -7,14 +7,12 @@
 <!-- ENGINE -->
 <script src="libs/peggy.min.js"></script>
 <script src="libs/howler.core.min.js"></script>
-<script src="engine.js"></script>
-<link rel="stylesheet" href="engine.css">
-<script>document.addEventListener("DOMContentLoaded", setup_engine)</script>
+<script src="modules/engine/engine.js"></script>
+<link href="modules/engine/engine.css" rel="stylesheet">
 
 <!-- VIDEOTOME -->
-<script src="videotome.js"></script>
-<link rel="stylesheet" href="videotome.css">
-<script>document.addEventListener("DOMContentLoaded", setup_videotome)</script>
+<script src="modules/videotome/videotome.js"></script>
+<link href="modules/videotome/videotome.css" rel="stylesheet">
 <script id="grammars/videotome" type="text/pegjs">
 {{
   function filter(line) {
@@ -38,7 +36,7 @@ ScriptLine
   / Dialogue
 
 Dialogue
-  = style:Selector |..| _ text:TextLine? { return { style, text } }
+  = style:Selector |..| text:TextLine? { return { style, text } }
 
 Choice
   = choice:ChoiceLine |1.., _ "\n"| { return { choice } }
@@ -55,13 +53,11 @@ TextLine
 Selector
   = "[" attr:Name "]" { return { attr } }
   / "." cls:Name { return { cls } }
+  / "." { return {} }
 
 _ = [ \t]*
 __ = [ \t\r\n]*
 </script>
-
-<!-- WAIT TO SETUP -->
-<script>document.addEventListener("DOMContentLoaded", do_loading)</script>
 
 <!--GAME CONTENT -->
 <link rel="stylesheet" href="game.css">
@@ -106,7 +102,7 @@ very aggressive
 nice and peaceful
 i raise the camera to my eye
 .S NANCY? IS THAT YOU?
-through the viewfinder i see a woman 
+. through the viewfinder i see a woman 
 thirty or forty i'm bad with age
 older than me
 brown hair past her shoulders
@@ -120,32 +116,39 @@ snap
 :dialogue
 !background BG_SOPH.png
 photograph
-.N UM. MISS SOPHIE?
+.N 
+UM. MISS SOPHIE?
+. 
 smile
 .S IT IS YOU! 
-.S I WAS WORRIED YOU MISSED THE STATION
+I WAS WORRIED YOU MISSED THE STATION
 .N UH I MADE IT JUST FINE
 .S THAT'S GREAT. I'LL SHOW YOU TO THE INN
-.S IT'S NOT FAR TO WALK.
-.S YOU MUST BE TIRED FROM TRAVELLING. BIG BAG!
-.N NOT REALLY. IT'S JUST SITTING DOWN
-giggle
+IT'S NOT FAR TO WALK.
+YOU MUST BE TIRED FROM TRAVELLING. BIG BAG!
+.N 
+NOT REALLY. IT'S JUST SITTING DOWN
+. giggle
 she has a natural friendliness
 i
 do not
 short awkward dyke with dumb hair
 undercut growing out
 .S I LIKE YOUR HAIR, NANCY
-.S VERY PUNK ROCK
+VERY PUNK ROCK
 .N OH UH THANKS
 .S I CAN NEATEN UP THE BACK FOR YOU IF YOU WANT?
-.S OR IF YOU WANT A PROFESSIONAL THERE'S A BARBER
-.S THREE VILLAGES OVER
+OR IF YOU WANT A PROFESSIONAL THERE'S A BARBER
+THREE VILLAGES OVER
+.
 i laugh
 at the suggestion of a professional
-.N WASN'T A PROFESSIONAL WHO DID IT THE FIRST TIME
-.N JUST SOME DRUNK FRIENDS
-.S AH. YOUTH IS SO AMAZING, ISN'T IT?
+.N 
+WASN'T A PROFESSIONAL WHO DID IT THE FIRST TIME
+JUST SOME DRUNK FRIENDS
+.S
+AH. YOUTH IS SO AMAZING, ISN'T IT?
+.
 stare at my feet
 !background BG_RAPESEED.png
 walk in silence
@@ -154,27 +157,33 @@ i look at the fields we pass
 hedges thin and low
 great swathes of yellow rape waving in the sun
 we arrive
-.S HERE WE ARE :)
-.S I HOPE IT'S NOT TOO RUSTIC FOR A CITY GIRL
+.S 
+HERE WE ARE :)
+I HOPE IT'S NOT TOO RUSTIC FOR A CITY GIRL
+.
 it's lovely
 BG_INN.png - large old house built half into a cave
 footpaths all ways
 small carpark, four cars
 the guests
-.N IT LOOKS REALLY NICE
-.S I'M GLAD. COME IN AND I'LL SHOW YOU YOUR ROOM
+.N 
+IT LOOKS REALLY NICE
+.S 
+I'M GLAD. COME IN AND I'LL SHOW YOU YOUR ROOM
 we go
-.S IT'S THE EARLY SEASON RIGHT NOW
-.S NOT VERY BUSY
-.S I WON'T BE ABLE TO PAY THAT MUCH
-.N THAT'S OKAY. I AM
+IT'S THE EARLY SEASON RIGHT NOW
+NOT VERY BUSY
+I WON'T BE ABLE TO PAY THAT MUCH
+.N
+THAT'S OKAY. I AM
+.
 burnt out
 dumb stupid fuck
 uni was too hard for you was it
 idiot
 can't just stare at the ceiling all day
 .N JUST HAPPY TO HAVE A CHANGE OF PACE
-she laughs
+. she laughs
 brushes hair back from her shoulder
 hickey
 little red mark on her collarbone
@@ -182,7 +191,7 @@ little red mark on her collarbone
 .S THAT'S WHY PEOPLE COME HERE
 !background BG_ROOM.png
 .S AND WE'RE HERE! THIS IS YOUR ROOM :)
-it's cosy
+. it's cosy
 single bed, wooden headboard
 desk and wardrobe
 window out onto the garden
@@ -190,26 +199,26 @@ window out onto the garden
 .S EHEHE THAT'S A POLITE WAY OF SAYING SMALL
 .N UH - I MEANT IT! I LIKE SMALL SPACES
 .N IT'S LIKE...
-i can touch every wall if i want to
+. i can touch every wall if i want to
 the snail seeks a shell its size
 five foot two, small shell
 .N I CAN FILL UP THE SPACE WITHOUT FEELING SMALL
 .N EMOTIONALLY, I MEAN
 .N UHH Y'KNOW LIKE. VIBES. SORRY
-she giggles again
+. she giggles again
 finger to her mouth for a second
 .S NO I GET WHAT YOU MEAN. 
 .S I'LL LEAVE YOU TO GET SETTLED
 .S CUP OF TEA IN TWENTY MINUTES?
 .S I'LL SHOW AND TALK YOU THROUGH THE JOB
-inn housekeeper assistant
+. inn housekeeper assistant
 what is there to really talk through?
 serve breakfast clean sheets vacuum
 smile little fake smile at guests
 well i'm not great at that last part
 .N THAT WOULD BE GREAT THANKS
 .N I'LL UH PUT MY STUFF AWAY
-she leaves
+. she leaves
 i breathe
 !background BG_CLEAR.png
 play the rest of the example game at <a href="https://dominoclub.itch.io/hot-wet"> dominoclub.itch.io/hot-wet</a>

@@ -1,8 +1,11 @@
 "use strict";
 
+document.addEventListener("DOMContentLoaded", setup_videotome);
+
 const VIDEOTOME = {
   data: {},
   lines: [],
+  styling: { attributes: [], classes: [] },
 };
 
 const COMMANDS = new Map();
@@ -50,9 +53,9 @@ function SET_BACKGROUND(id) {
   ENGINE.viewport.style.backgroundImage = `url(${IMAGES.get(id) ?? ""})`;
 }
 
-function PUSH_TEXT(text, styles=[], attrs=[]) {
-    const attrs_ = Object.fromEntries(attrs.map((name) => [name, ""]));
-    const element = html("span", { ...attrs_, class: ["text", ...styles].join(" ") });
+function PUSH_TEXT(text, styling={ attributes: [], classes: [] }) {
+    const attrs_ = Object.fromEntries(styling.attributes.map((name) => [name, ""]));
+    const element = html("span", { ...attrs_, class: ["text", ...styling.classes].join(" ") });
     element.innerHTML = text;
     PUSH_ELEMENT(element);
 }
@@ -93,9 +96,6 @@ async function JUMP(label) {
 }
 
 async function RUN_LINE(line) {
-  const styles = [];
-  const attrs = [];
-
   if (line.choice) {
     await PUSH_CHOICE(line.choice);
     return true;
@@ -104,14 +104,16 @@ async function RUN_LINE(line) {
     return await async_eval(line.script);
   if (line.command)
     return COMMANDS.get(line.command.toLowerCase())(line.input);
-  if (line.style)
+  if (line.style && line.style.length > 0) {
+    VIDEOTOME.styling = { attributes: [], classes: [] }
     for (const style of line.style)
       if (style.cls)
-        styles.push(style.cls);
+        VIDEOTOME.styling.classes.push(style.cls);
       else if (style.attr)
-        attrs.push(style.attr);
+        VIDEOTOME.styling.classes.push(style.attr);
+  }
   if (line.text || line.escape) {
-    await PUSH_TEXT(line.text, styles, attrs);
+    await PUSH_TEXT(line.text, VIDEOTOME.styling);
     return true;
   }
 

@@ -1,3 +1,8 @@
+"use strict";
+
+document.addEventListener("DOMContentLoaded", setup_engine);
+document.addEventListener("DOMContentLoaded", do_loading);
+
 let ENGINE = {};
 
 ENGINE.loadingDialog = document.getElementById("loading");
@@ -255,7 +260,6 @@ function suppress(event) {
 const _AsyncFunction = Object.getPrototypeOf(async function(){}).constructor
 
 function async_eval(code) {
-  script = _AsyncFunction(code)
+  const script = _AsyncFunction(code)
   return script.call();
 }
-
