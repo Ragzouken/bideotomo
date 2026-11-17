@@ -1,7 +1,3 @@
-#controls {
-  /* display: none; */
-}
-
 .text {
   color: #FAF9F6;
   text-align: center;
@@ -9,20 +5,16 @@
   text-shadow: 2px 2px 4px black;
 }
 
-.N {
+.nancy, .n {
     color: #cfeef9;
     text-align: left;
 }
 
-.S {
+.sophie, .s {
     color: #eccedf;
     text-align: right;
 }
 
 .text:not(:last-child) {
   color: #6A6A6A;
-}
-
-[test] {
-  color: red;
 }
