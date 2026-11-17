@@ -63,7 +63,6 @@
     }
 
     img {
-      filter: invert();
       width: 32px;
       opacity: 50%;
     }
