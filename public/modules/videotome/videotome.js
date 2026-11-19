@@ -50,7 +50,7 @@ function RUN_PASSAGE(passage) {
 }
 
 function SET_BACKGROUND(id) {
-  ENGINE.viewport.style.backgroundImage = `url(${IMAGES.get(id) ?? ""})`;
+  ENGINE.view.style.backgroundImage = `url(${IMAGES.get(id) ?? ""})`;
 }
 
 function PUSH_TEXT(text, styling={ attributes: [], classes: [] }) {
@@ -63,6 +63,8 @@ function PUSH_TEXT(text, styling={ attributes: [], classes: [] }) {
 function PUSH_CHOICE(choices, styles=[]) {
   function make_button({ text, label }) {
     const button = html("button", {}, text);
+    // hack...
+    button.addEventListener("pointerdown", function(event) { button.setPointerCapture(event.pointerId); });
     button.addEventListener("click", () => { JUMP(label); ADVANCE(); } );
     button.addEventListener("click", suppress);
     return button;
@@ -87,6 +89,7 @@ async function ADVANCE() {
 }
 
 async function JUMP(label) {
+  console.log("JUMP", label)
   for (const passage of PASSAGES.values()) {
     const index = passage.findIndex(line => line.label == label);
     if (index < 0) continue;
@@ -147,30 +150,19 @@ async function setup_videotome() {
   findCommandInputs("music").forEach(name => AUDIOS.set(name, `assets/${name}`));
 
   // setup
-  const auto = new HoldableButton(html("button", {}, html("img", { src: "assets/chevron-double-down.svg" })));
+  const auto = new HoldableButton();
   auto.addEventListener("pressed", () => AUTO_ON());
   auto.addEventListener("released", () => AUTO_OFF());
   
+  const autoButton = html("button", {}, html("img", { src: "assets/chevron-double-down.svg" }));
   VIDEOTOME.container = html("section", { id: "container" });
-  VIDEOTOME.controls = html("section", { id: "controls" }, auto.element);
+  VIDEOTOME.controls = html("section", { id: "controls" }, autoButton);
   
-  /*
-
-  const setup = html`
-  $body
-    section#container
-    section#controls
-      button
-        img(src="assets/chevron-double-down.svg")
-  `
-
-  */
-
-  // TODO: give controls a place in engine too
-  ENGINE.viewport.append(VIDEOTOME.container);
-  document.body.append(VIDEOTOME.controls);
+  ENGINE.view.append(VIDEOTOME.container);
+  ENGINE.full.append(VIDEOTOME.controls);
 
   // click to advance
+  auto.bindElement(autoButton);
   auto.bindElement(VIDEOTOME.container);
 
   for (const key of ADVANCE_KEYS)

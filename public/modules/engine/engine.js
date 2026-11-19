@@ -31,9 +31,11 @@ function PLAY_SOUND(id) {
 }
 
 async function setup_engine() {
-  ENGINE.viewport = html("div", { id: "viewport" });
-  document.body.append(ENGINE.viewport);
-  repeat(() => scaleElementToParent(ENGINE.viewport));
+  ENGINE.view = html("div", { id: "viewport" });
+  ENGINE.full = document.body;
+
+  document.body.append(ENGINE.view);
+  repeat(() => scaleElementToParent(ENGINE.view));
 
   load_grammars();
   use_grammars();
@@ -183,13 +185,9 @@ async function loadMediaElement(element) {
 }
 
 class HoldableButton extends EventTarget {
-  /** @param {HTMLElement} element */
-  constructor(element) {
+  constructor() {
     super();
-    this.element = element;
     this.holds = new Set();
-
-    this.bindElement(element);
   }
 
   get isHeld() {
@@ -198,12 +196,20 @@ class HoldableButton extends EventTarget {
 
   bindElement(element) {
     // pointer capture listens to cursor even when it leaves the element
-    element.addEventListener("pointerdown", this.onPointerDown.bind(this));
-    element.addEventListener("lostpointercapture", this.onLostPointerCapture.bind(this));
+    element.addEventListener("pointerdown", (event) => {
+      element.setPointerCapture(event.pointerId);
+      this.press(event.pointerId);
+    }, { capture: true });
+    element.addEventListener("lostpointercapture", (event) => {
+      this.release(event.pointerId);
+    });
       
     // suppress mobile longpress (and haptic vibrate)
     element.addEventListener("touchstart", suppress);
     element.addEventListener("dragstart", suppress);
+
+    this.addEventListener("pressed", () => element.classList.toggle("button-held", true));
+    this.addEventListener("released", () => element.classList.toggle("button-held", false));
   }
 
   bindKey(key) {
@@ -223,13 +229,11 @@ class HoldableButton extends EventTarget {
   }
 
   becomePressed() {
-    this.element.classList.toggle("button-held", true);
     const event = new CustomEvent("pressed", { detail: { button: this } });
     this.dispatchEvent(event);
   }
 
   becomeReleased() {
-    this.element.classList.toggle("button-held", false);
     const event = new CustomEvent("released", { detail: { button: this } });
     this.dispatchEvent(event);
   }
@@ -245,15 +249,6 @@ class HoldableButton extends EventTarget {
     if (this.holds.size == 0)
       this.becomeReleased();
   }
-  
-  onPointerDown(event) {
-    this.element.setPointerCapture(event.pointerId);
-    this.press(event.pointerId);
-  }
-
-  onLostPointerCapture(event) {
-    this.release(event.pointerId);
-  }
 }
 
 function suppress(event) {
@@ -266,4 +261,37 @@ const _AsyncFunction = Object.getPrototypeOf(async function(){}).constructor
 function async_eval(code) {
   const script = _AsyncFunction(code)
   return script.call();
+}
+
+const _ELEMENT_PARSER = peggy.generate(String.raw`
+Root
+  = _? @Element _?
+
+Element
+  = _? tag:Name? id:("#" @Name)? classes:("." @Name) |..| attributes:Attributes? { return { tag, id, classes, attributes } }
+
+Attributes
+  = "[" attributes:Attribute |..,","| "]" { return Object.fromEntries(attributes) } 
+
+Attribute
+  = @Name _? "=" _? '"' @$[^"]* '"'
+
+Name
+  = $[a-z]+
+
+_ "whitespace"
+  = [ \t\n]+
+`);
+
+function ELEMENT(query) {
+  const data = _ELEMENT_PARSER.parse(query);
+  const attrs = data.attributes ?? {};
+
+  if (data.id)
+    attrs["id"] = data.id;
+
+  if (data.classes.length > 0)
+    attrs["class"] = data.classes.join(" ");
+
+  return html(data.tag, attrs);
 }
