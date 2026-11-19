@@ -133,43 +133,48 @@ async function setup_videotome() {
     EVENTS.set(id, RUN_PASSAGE(id));
 
   // find resources to preload
-  const tags = [...new Set(
-    [...PASSAGES.values()]
-    .flatMap(passage => passage)
-    .flatMap(line => line.input ?? [])
-  )];
+  const lines = [...PASSAGES.values().flatMap(passage => passage)];
+  function findCommandInputs(command) {
+    return new Set(
+      lines
+      .filter(line => line.command == command)
+      .map(command => command.input)
+    );
+  }
+
+  findCommandInputs("background").forEach(name => IMAGES.set(name, `assets/${name}`));
+  findCommandInputs("sound").forEach(name => AUDIOS.set(name, `assets/${name}`));
+  findCommandInputs("music").forEach(name => AUDIOS.set(name, `assets/${name}`));
 
   // setup
-  VIDEOTOME.container = html("section", { id: "container" });
-  VIDEOTOME.controls = html("section", { id: "controls" });
-  ENGINE.viewport.append(VIDEOTOME.container, VIDEOTOME.controls);
-  document.body.append(VIDEOTOME.controls);
-
   const auto = new HoldableButton(html("button", {}, html("img", { src: "assets/chevron-double-down.svg" })));
   auto.addEventListener("pressed", () => AUTO_ON());
   auto.addEventListener("released", () => AUTO_OFF());
-  for (const key of ADVANCE_KEYS)
-    auto.bindKey(key);
-  VIDEOTOME.controls.append(auto.element);
+  
+  VIDEOTOME.container = html("section", { id: "container" });
+  VIDEOTOME.controls = html("section", { id: "controls" }, auto.element);
+  
+  /*
 
-  tags
-  .filter(tag => tag.startsWith("BG_"))
-  .forEach(name => IMAGES.set(name, `assets/${name}`));
-    
-  tags
-  .filter(tag => tag.startsWith("MUS_") || tag.startsWith("SFX_"))
-  .forEach(name => AUDIOS.set(name, `assets/${name}`));
+  const setup = html`
+  $body
+    section#container
+    section#controls
+      button
+        img(src="assets/chevron-double-down.svg")
+  `
+
+  */
+
+  // TODO: give controls a place in engine too
+  ENGINE.viewport.append(VIDEOTOME.container);
+  document.body.append(VIDEOTOME.controls);
 
   // click to advance
-  VIDEOTOME.container.addEventListener("pointerdown", (event) => {
-    event.preventDefault();
-    auto.press();
-  });
+  auto.bindElement(VIDEOTOME.container);
 
-  VIDEOTOME.container.addEventListener("pointerup", (event) => {
-    event.preventDefault();
-    auto.release();
-  });
+  for (const key of ADVANCE_KEYS)
+    auto.bindKey(key);
 
   RUN_PASSAGE("passages/main");
 

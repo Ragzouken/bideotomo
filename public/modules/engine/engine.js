@@ -189,6 +189,14 @@ class HoldableButton extends EventTarget {
     this.element = element;
     this.holds = new Set();
 
+    this.bindElement(element);
+  }
+
+  get isHeld() {
+    return this.holds.size > 0;
+  }
+
+  bindElement(element) {
     // pointer capture listens to cursor even when it leaves the element
     element.addEventListener("pointerdown", this.onPointerDown.bind(this));
     element.addEventListener("lostpointercapture", this.onLostPointerCapture.bind(this));
@@ -196,10 +204,6 @@ class HoldableButton extends EventTarget {
     // suppress mobile longpress (and haptic vibrate)
     element.addEventListener("touchstart", suppress);
     element.addEventListener("dragstart", suppress);
-  }
-
-  get isHeld() {
-    return this.holds.size > 0;
   }
 
   bindKey(key) {
