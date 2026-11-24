@@ -3,10 +3,6 @@
 document.addEventListener("DOMContentLoaded", setup_engine);
 document.addEventListener("DOMContentLoaded", do_loading);
 
-let ENGINE = {};
-
-ENGINE.loadingDialog = document.getElementById("loading");
-
 const PARSERS = new Map();
 const PARSEDS = new Map();
 
@@ -18,8 +14,6 @@ function RUN_EVENT(id) {
   return EVENTS.get(id)();
 }
 
-ENGINE.musicElement = html("audio", { loop: "true" });
-
 function PLAY_MUSIC(id) {
   ENGINE.musicElement.pause();
   ENGINE.musicElement.src = AUDIOS.get(id);
@@ -30,7 +24,12 @@ function PLAY_SOUND(id) {
   html("audio", { src: AUDIOS.get(id) }).play();
 }
 
+let ENGINE = {};
+
 async function setup_engine() {
+  ENGINE.loadingDialog = document.getElementById("loading");
+  ENGINE.musicElement = html("audio", { loop: "true" });
+
   ENGINE.view = html("div", { id: "viewport" });
   ENGINE.full = document.body;
 
@@ -272,37 +271,4 @@ const _AsyncFunction = Object.getPrototypeOf(async function(){}).constructor
 function async_eval(code) {
   const script = _AsyncFunction(code)
   return script.call();
-}
-
-const _ELEMENT_PARSER = peggy.generate(String.raw`
-Root
-  = _? @Element _?
-
-Element
-  = _? tag:Name? id:("#" @Name)? classes:("." @Name) |..| attributes:Attributes? { return { tag, id, classes, attributes } }
-
-Attributes
-  = "[" attributes:Attribute |..,","| "]" { return Object.fromEntries(attributes) } 
-
-Attribute
-  = @Name _? "=" _? '"' @$[^"]* '"'
-
-Name
-  = $[a-z]+
-
-_ "whitespace"
-  = [ \t\n]+
-`);
-
-function ELEMENT(query) {
-  const data = _ELEMENT_PARSER.parse(query);
-  const attrs = data.attributes ?? {};
-
-  if (data.id)
-    attrs["id"] = data.id;
-
-  if (data.classes.length > 0)
-    attrs["class"] = data.classes.join(" ");
-
-  return html(data.tag, attrs);
 }
