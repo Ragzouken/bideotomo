@@ -266,6 +266,10 @@ function suppress(event) {
   event.stopPropagation();
 }
 
+function capture(event) {
+  event.stopPropagation();
+}
+
 const _AsyncFunction = Object.getPrototypeOf(async function(){}).constructor
 
 function async_eval(code) {

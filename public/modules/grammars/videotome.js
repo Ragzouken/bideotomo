@@ -28,8 +28,8 @@ add_grammar("grammars/videotome", String.raw`
       else
         lines.push({ command: tag });
     }
-    if (line.text)
-      lines.push({ text: line.text });
+    if (line.text || line.tags)
+      lines.push({ text: line.text ?? "" });
     lines.push({ style: [ { cls: "" } ] });
     return lines;
   }
