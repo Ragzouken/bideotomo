@@ -50,8 +50,4 @@ html, body {
   left: 50%;
   top: 50%;
   translate: -50% -50%;
-
-  /* TODO: why... */
-  display: grid;
-  grid-template-areas: "main";
 }

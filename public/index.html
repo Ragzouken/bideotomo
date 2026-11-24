@@ -30,11 +30,18 @@
 </template>
 
 <style>
+@font-face {
+  font-family: YanoneKaffeesatz;
+  src: url(./assets/YanoneKaffeesatz-Medium.ttf);
+}
+
 .text {
   color: #FAF9F6;
   text-align: center;
   
   text-shadow: 2px 2px 4px black;
+
+  font-family: YanoneKaffeesatz;
 }
 
 .nancy, .N {
@@ -171,7 +178,7 @@ BG_CLEAR - play the rest of the example game at <a href="https://dominoclub.itch
 CLEARSCREEN - KEEP GOING TO RESTART
 </script>
 
-<script id="passages/main" type="text/videotome" grammar="grammars/bideotomo">
+<script id="passages/main" type="text" grammar="grammars/bideotomo">
 :start
 !music MUS_TITLE
 

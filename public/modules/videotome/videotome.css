@@ -7,7 +7,6 @@
 
 #viewport {
   border-radius: 1rem;
-  /* overflow: hidden; */
 
   display: grid;
   grid-template-areas: 

@@ -131,9 +131,6 @@ async function setup_videotome() {
   for (const element of document.querySelectorAll(`[type="text/videotome"]`))
     PASSAGES.set(element.id, PARSEDS.get(element.id));
 
-  for (const id of PASSAGES.keys())
-    EVENTS.set(id, RUN_PASSAGE(id));
-
   // setup
   const auto = new HoldableButton();
   auto.addEventListener("pressed", () => AUTO_ON());
@@ -153,7 +150,9 @@ async function setup_videotome() {
   for (const key of ADVANCE_KEYS)
     auto.bindKey(key);
 
-  RUN_PASSAGE("passages/main");
+  // RUN_PASSAGE("passages/main");
+
+  JUMP("start");
 
   ENGINE.loadingDialog.addEventListener("close", () => ADVANCE());
 }
