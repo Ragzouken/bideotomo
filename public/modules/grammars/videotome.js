@@ -25,6 +25,8 @@ add_grammar("grammars/videotome", String.raw`
       	lines.push({ style: [ { cls: tag.replace("!", "") } ] });
       else if (tag.startsWith("CLEARSCREEN"))
         lines.push({ command: "clear" });
+      else
+        lines.push({ command: tag });
     }
     if (line.text)
       lines.push({ text: line.text });

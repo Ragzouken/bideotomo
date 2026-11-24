@@ -150,9 +150,7 @@ async function setup_videotome() {
   for (const key of ADVANCE_KEYS)
     auto.bindKey(key);
 
-  // RUN_PASSAGE("passages/main");
-
-  JUMP("start");
+  RUN_PASSAGE("passages/main");
 
   ENGINE.loadingDialog.addEventListener("close", () => ADVANCE());
 }
