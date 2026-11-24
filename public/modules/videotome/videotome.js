@@ -6,6 +6,7 @@ const VIDEOTOME = {
   data: {},
   lines: [],
   styling: { attributes: [], classes: [] },
+  empty: [html("div"), html("div"), html("div")],
 };
 
 const COMMANDS = new Map();
@@ -19,7 +20,7 @@ SET_COMMAND("stop", true, () => VIDEOTOME.lines = []);
 SET_COMMAND("sound", false, (id) => PLAY_SOUND(id));
 SET_COMMAND("music", false, (id) => PLAY_MUSIC(id));
 SET_COMMAND("jump", false, (id) => JUMP(id));
-SET_COMMAND("clear", false, () => VIDEOTOME.container.replaceChildren());
+SET_COMMAND("clear", false, () => CLEAR());
 SET_COMMAND("background", false, (id) => SET_BACKGROUND(id));
 
 let AUTO;
@@ -30,8 +31,6 @@ function AUTO_ON(interval=500) {
 }
 
 function AUTO_OFF() {
-  if (!AUTO) return;
-
   clearInterval(AUTO);
   AUTO = undefined;
 }
@@ -83,11 +82,13 @@ function PUSH_CHOICE(choices, styles=[]) {
   PUSH_ELEMENT(element);
 }
 
-const _PADDING = [html("div"), html("div"), html("div")];
-
 function PUSH_ELEMENT(element) {
   VIDEOTOME.container.append(element);
-  VIDEOTOME.container.replaceChildren(...[..._PADDING, ...VIDEOTOME.container.children].slice(-3));
+  VIDEOTOME.container.firstChild.remove();
+}
+
+function CLEAR() {
+  VIDEOTOME.container.replaceChildren(...VIDEOTOME.empty)
 }
 
 async function ADVANCE() {
@@ -158,6 +159,9 @@ async function setup_videotome() {
 
   for (const key of ADVANCE_KEYS)
     auto.bindKey(key);
+
+  // initial empty lines
+  CLEAR();
 
   // run starting passage
   RUN_PASSAGE("passages/main");
