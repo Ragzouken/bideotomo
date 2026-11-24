@@ -53,18 +53,31 @@ function SET_BACKGROUND(id) {
   ENGINE.view.style.backgroundImage = `url(${IMAGES.get(id) ?? ""})`;
 }
 
+function make_clickable(element) {
+  element.addEventListener("pointerdown", function(event) {
+    element.setPointerCapture(event.pointerId);
+    event.stopPropagation();
+  });
+}
+
 function PUSH_TEXT(text, styling={ attributes: [], classes: [] }) {
-    const attrs_ = Object.fromEntries(styling.attributes.map((name) => [name, ""]));
-    const element = html("span", { ...attrs_, class: ["text", ...styling.classes].join(" ") });
-    element.innerHTML = text;
-    PUSH_ELEMENT(element);
+  const attrs_ = Object.fromEntries(styling.attributes.map((name) => [name, ""]));
+  const element = html("span", { ...attrs_, class: ["text", ...styling.classes].join(" ") });
+  element.innerHTML = text;
+
+  for (const link of element.querySelectorAll("a")) {
+    link.target = "_blank";
+    make_clickable(link);
+  }
+
+  PUSH_ELEMENT(element);
 }
 
 function PUSH_CHOICE(choices, styles=[]) {
   function make_button({ text, label }) {
     const button = html("button", {}, text);
     // hack...
-    button.addEventListener("pointerdown", function(event) { button.setPointerCapture(event.pointerId); });
+    make_clickable(button);
     button.addEventListener("click", () => { JUMP(label); ADVANCE(); } );
     button.addEventListener("click", suppress);
     return button;
@@ -131,11 +144,7 @@ async function setup_videotome() {
   for (const element of document.querySelectorAll(`[type="text/videotome"]`))
     PASSAGES.set(element.id, PARSEDS.get(element.id));
 
-  // setup
-  const auto = new HoldableButton();
-  auto.addEventListener("pressed", () => AUTO_ON());
-  auto.addEventListener("released", () => AUTO_OFF());
-  
+  // setup html and controls
   const autoButton = html("button", {}, html("img", { src: "assets/chevron-double-down.svg" }));
   VIDEOTOME.container = html("section", { id: "container" });
   VIDEOTOME.controls = html("section", { id: "controls" }, autoButton);
@@ -143,14 +152,20 @@ async function setup_videotome() {
   ENGINE.view.append(VIDEOTOME.container);
   ENGINE.full.append(VIDEOTOME.controls);
 
-  // click to advance
+  // click/hold to advance
+  const auto = new HoldableButton();
+  auto.addEventListener("pressed", () => AUTO_ON());
+  auto.addEventListener("released", () => AUTO_OFF());
+  
   auto.bindElement(autoButton);
   auto.bindElement(VIDEOTOME.container);
 
   for (const key of ADVANCE_KEYS)
     auto.bindKey(key);
 
+  // run starting passage
   RUN_PASSAGE("passages/main");
 
+  // advance immediately on enter
   ENGINE.loadingDialog.addEventListener("close", () => ADVANCE());
 }

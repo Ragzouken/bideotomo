@@ -35,11 +35,6 @@ add_grammar("grammars/videotome", String.raw`
   }
 }}
 
-{
-  // strip end of line comments
-  input = input.replace(/\/\/[^\n]*\n/g, "\n");
-}
-
 Script
   = __ lines:ScriptLine |.., _ "\n"| __ { return convert(lines); }
 

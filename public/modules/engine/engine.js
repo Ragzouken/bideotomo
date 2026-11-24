@@ -209,7 +209,7 @@ class HoldableButton extends EventTarget {
     element.addEventListener("pointerdown", (event) => {
       element.setPointerCapture(event.pointerId);
       this.press(event.pointerId);
-    }, { capture: true });
+    });
     element.addEventListener("lostpointercapture", (event) => {
       this.release(event.pointerId);
     });
