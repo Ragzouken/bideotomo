@@ -110,7 +110,20 @@ async function do_loading() {
 
   ENGINE.loadingDialog.removeAttribute("loading");
   ENGINE.loadingDialog.replaceChildren("tap or click to play");
-  ENGINE.loadingDialog.addEventListener("click", () => ENGINE.loadingDialog.close(), { once: true });
+
+  // wait for input and close loading dialogue
+  const closed = new AbortController();
+  const signal = closed.signal;
+
+  function onFirstInput(event) {
+    event.preventDefault();
+    event.stopPropagation();
+    ENGINE.loadingDialog.close();
+  }
+
+  window.addEventListener("click", onFirstInput, { signal, capture: true });
+  window.addEventListener("keydown", onFirstInput, { signal, capture: true });
+  ENGINE.loadingDialog.addEventListener("close", () => closed.abort());
 }
 
 /**

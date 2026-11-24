@@ -143,7 +143,7 @@ async function setup_videotome() {
 
   // setup html and controls
   const autoButton = html("button", {}, html("img", { src: "assets/chevron-double-down.svg" }));
-  VIDEOTOME.container = html("section", { id: "container" });
+  VIDEOTOME.container = html("section", { id: "container" }, ...VIDEOTOME.empty);
   VIDEOTOME.controls = html("section", { id: "controls" }, autoButton);
   
   ENGINE.view.append(VIDEOTOME.container);
@@ -159,9 +159,6 @@ async function setup_videotome() {
 
   for (const key of ADVANCE_KEYS)
     auto.bindKey(key);
-
-  // initial empty lines
-  CLEAR();
 
   // run starting passage
   RUN_PASSAGE("passages/main");
