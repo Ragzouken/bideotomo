@@ -29,6 +29,10 @@
   align-items: center;
 
   background-position: center;
+
+  /* child elements don't block clicks, except hyperlinks */
+  * { pointer-events: none; }
+  a { pointer-events: auto; }
 }
 
 #controls {

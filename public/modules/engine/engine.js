@@ -207,6 +207,19 @@ async function loadMediaElement(element) {
   });
 }
 
+/**
+ * @template {keyof HTMLElementEventMap} K
+ * @param {HTMLElement} element 
+ * @param {K} type 
+ * @param {(event: HTMLElementEventMap[K]) => any} listener 
+ * @param {AddEventListenerOptions} options?
+ */
+function listen_event_exact(element, type, listener, options) {
+  element.addEventListener(type, (event) => {
+    if (event.target === element) listener.call(element, event)
+  }, options);
+}
+
 class HoldableButton extends EventTarget {
   constructor() {
     super();
@@ -217,19 +230,23 @@ class HoldableButton extends EventTarget {
     return this.holds.size > 0;
   }
 
+  /**
+   * @param {HTMLElement} element 
+   */
   bindElement(element) {
     // pointer capture listens to cursor even when it leaves the element
-    element.addEventListener("pointerdown", (event) => {
+    listen_event_exact(element, "pointerdown", (event) => {
       element.setPointerCapture(event.pointerId);
       this.press(event.pointerId);
     });
-    element.addEventListener("lostpointercapture", (event) => {
+    listen_event_exact(element, "lostpointercapture", (event) => {
+      console.log("LOST", event)
       this.release(event.pointerId);
     });
       
     // suppress mobile longpress (and haptic vibrate)
-    element.addEventListener("touchstart", suppress);
-    element.addEventListener("dragstart", suppress);
+    listen_event_exact(element, "touchstart", suppress);
+    listen_event_exact(element, "dragstart", suppress);
 
     this.addEventListener("pressed", () => element.classList.toggle("button-held", true));
     this.addEventListener("released", () => element.classList.toggle("button-held", false));

@@ -56,15 +56,6 @@ function PUSH_TEXT(text, styling={ attributes: [], classes: [] }) {
   const attrs_ = Object.fromEntries(styling.attributes.map((name) => [name, ""]));
   const element = html("span", { ...attrs_, class: ["text", ...styling.classes].join(" ") });
   element.innerHTML = text;
-
-  for (const link of element.querySelectorAll("a")) {
-    // open in new tab
-    link.target = "_blank";
-    // don't bubble on to click screen and advance
-    link.addEventListener("pointerdown", capture);
-    link.addEventListener("touchstart", capture);
-  }
-
   PUSH_ELEMENT(element);
 }
 
