@@ -62,6 +62,7 @@ function PUSH_TEXT(text, styling={ attributes: [], classes: [] }) {
     link.target = "_blank";
     // don't bubble on to click screen and advance
     link.addEventListener("pointerdown", capture);
+    link.addEventListener("touchstart", capture);
   }
 
   PUSH_ELEMENT(element);

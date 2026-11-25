@@ -280,7 +280,7 @@ function suppress(event) {
 }
 
 function capture(event) {
-  event.stopPropagation();
+  event.stopImmediatePropagation();
 }
 
 const _AsyncFunction = Object.getPrototypeOf(async function(){}).constructor
