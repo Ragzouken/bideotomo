@@ -240,7 +240,6 @@ class HoldableButton extends EventTarget {
       this.press(event.pointerId);
     });
     listen_event_exact(element, "lostpointercapture", (event) => {
-      console.log("LOST", event)
       this.release(event.pointerId);
     });
       

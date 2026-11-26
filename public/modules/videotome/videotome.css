@@ -33,6 +33,8 @@
   /* child elements don't block clicks, except hyperlinks */
   * { pointer-events: none; }
   a { pointer-events: auto; }
+
+  a:hover { filter: brightness(150%); }
 }
 
 #controls {
